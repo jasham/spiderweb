@@ -55,7 +55,7 @@ list_all = (req,res) => {
 
 specific_list = (req,res) => {
     // console.log("Here is request specific",req.params.id)
-    service.list_specific_services(req.params.id).then((data) => {
+    service.list_specific_services(req.query.id).then((data) => {
         if (data)
             return res.status(200).send(data)
         else{
@@ -67,7 +67,7 @@ specific_list = (req,res) => {
 
 router.post('/',upload.single('image'), validate(serviceValidationRules), add)
 router.get('/', list_all)
-router.get('/:id',specific_list)
+router.get('/specific',specific_list)
 
 //pattch
 //delete

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const user = new mongoose.Schema({
+const userDetails = new mongoose.Schema({
     name : {
         type : String,
         required : true,
@@ -8,13 +8,22 @@ const user = new mongoose.Schema({
         max : 255
     },
     dob : {type : Date},
-    sex : {type : String},
-    mobile : {type : String},
+    gender : {type : String},
+    mobile : {
+        type : String,
+        required: true,
+        index:{
+            unique:true,
+        }
+
+    },
     email : {
         type : String,
-        required : true,
-        max : 255,
-        min : 6
+        required: true,
+        index:{
+            unique:true,
+        },
+        match: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     },
     date : {
         type : Date,
@@ -22,4 +31,4 @@ const user = new mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('User',user)
+module.exports = mongoose.model('User', userDetails)

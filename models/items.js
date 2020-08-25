@@ -7,7 +7,7 @@ const items = mongoose.Schema({
     brand_id : { type : Number},
     price : { type : Number},
     unit : { type : Number},
-    image : { type : String}
-})
+    image_id : { type : String}
+});
 
 module.exports = mongoose.model('Items',items)

@@ -6,9 +6,3 @@ mongoose.connect('mongodb://localhost:27017/myapp', { useNewUrlParser: true, use
 }).catch(err => {
     console.log(err);
 });
-
-module.exports = {
-    user: require('../models/user'),
-    service: require('../models/service'),
-    image : require('../models/image') 
-}
