@@ -1,6 +1,5 @@
 var jwt = require('jsonwebtoken');
-
-
+const config = require('./config')
 
 CheckAuthentication=(req,res,next)=>{
  

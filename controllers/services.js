@@ -65,12 +65,47 @@ specific_list = (req,res) => {
     })
 }
 
+specific_list_patch = (req,res) => {
+    service.patch_specific_services(req).then((data) => {
+        console.log("Teja tejavini",data)
+
+        if (data)
+            return res.status(200).send(data)
+        else{
+            result = 'fail'
+            res.send()
+        }
+    })
+}
+
+specific_list_patch = (req,res) => {
+    service.patch_specific_services(req).then((data) => {
+        if (data)
+            return res.status(200).send(data)
+        else{
+            result = 'fail'
+            res.send()
+        }
+    })
+}
+
+
+specific_list_delete = (req,res) => {
+    service.delete_specific_services(req.params.id).then((data) => {
+        if (data)
+            return res.status(200).send(data)
+        else{
+            result = 'fail'
+            res.send()
+        }
+    })
+}
+
 router.post('/',upload.single('image'), validate(serviceValidationRules), add)
 router.get('/', list_all)
 router.get('/:id',specific_list)
-
-//pattch
-//delete
+router.patch('/:id',specific_list_patch)
+router.delete('/:id',specific_list_delete)
 
 module.exports = router
 
