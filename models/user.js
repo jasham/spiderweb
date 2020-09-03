@@ -8,7 +8,7 @@ const user = new mongoose.Schema({
         max : 255
     },
     dob : {type : Date},
-    sex : {type : String},
+    gender : {type : String},
     mobile : {type : String},
     email : {
         type : String,
@@ -18,8 +18,10 @@ const user = new mongoose.Schema({
     },
     date : {
         type : Date,
-        default : Date.now
-    }
+        default : Date.now()
+    },
+    role : {type : String},
+    cred_id : {type : String}
 })
 
 module.exports = mongoose.model('User',user)

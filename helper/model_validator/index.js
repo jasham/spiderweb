@@ -7,8 +7,8 @@ const validate = (schemas)  => {
         if (result.isEmpty()) {
           return next();
         }
-  
-        const errors = result.array();
+        const errors = { msg : result.array()[0].msg };
+
         return  res.send(errors)
     };
 }

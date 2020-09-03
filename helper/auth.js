@@ -1,11 +1,11 @@
 var jwt = require('jsonwebtoken');
 const config = require('./config')
 
-CheckAuthentication=(req,res,next)=>{
- 
+checkAuthentication = (req,res,next) =>{
+  next()
 }
 
-Login = (req, res) => {
+login = (req, res) => {
     const paylod = {
         _id,
         uid,
@@ -30,4 +30,5 @@ const createNewToken = (payload) => {
 }
 
 module.exports = {
+  checkAuthentication
 }

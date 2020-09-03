@@ -7,7 +7,7 @@ const address = new mongoose.Schema({
     pincode : {type : Number},
     city : {type : String},
     state : {type : String},
-    country : {type : String}
+    country : {type : String},
 })
 
 exports.module = mongoose.model('Address',address)

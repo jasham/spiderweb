@@ -1,18 +1,11 @@
 const mongoose = require('mongoose')
 
 const credentails = new mongoose.Schema({
-    user_id : {
-        type : Number
-    },
-    password : {
-        type : String
-    },
-    modified : {
-        type : Date
-    },
-    created : {
-        type : Date
-    }
+    user_id : {type : Number},
+    password : {type : String},
+    modified : {type : Date},
+    created : {type : Date},
+    email : { type : String}
 })
 
 module.exports = mongoose.model('credentails',credentails)
