@@ -1,16 +1,16 @@
-const category = require('../services/category')
+const sub_category = require('../services/sub_category')
 const router = require('express').Router()
 const { validate } = require('../helper/model_validator')
-const { categoryValidationRules } = require('../helper/model_validator/category_validator')
+//const { sub_categoryValidationRules } = require('../helper/model_validator/sub_category_validator')
 
 
 const add = (req, res) => {
     try {
-        category.save(req.body).then(save_res => {
+        sub_category.save(req.body).then(save_res => {
             if (save_res.status === 'exist')
-                return res.status(200).send({ result: 'categoryExist' })
+                return res.status(200).send({ result: 'subCategoryExist' })
             else if (save_res.status)
-                return res.status(200).send({ result: 'success', data: save_res.save_res })
+                return res.status(200).send({ result: 'success', data: save_res.save_sub_cat })
             else
                 return res.send({ result: 'fail', error: save_res.error, data: null })
 
@@ -21,10 +21,10 @@ const add = (req, res) => {
 
 }
 
-const list_all_category = (req, res) => {
+const list_all_sub_category = (req, res) => {
     try {
         let result_data
-        category.list().then(list => {
+        sub_category.list(req.params.cat_id).then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.list })
             else
@@ -38,9 +38,9 @@ const list_all_category = (req, res) => {
     // global.io.sockets.in(global.users[1].userId).emit('notify_me', 'I am from user 1');
 }
 
-const get_specific_category = (req, res) => {
+const get_specific_sub_category = (req, res) => {
 
-    category.get_specific_category(req.params.id).then(data => {
+    sub_category.get_specific_sub_category(req.params.id).then(data => {
         if (data)
             return res.status(200).send(data)
         else {
@@ -50,9 +50,9 @@ const get_specific_category = (req, res) => {
     })
 }
 
-const del_specific_category = (req, res) => {
+const del_specific_sub_category = (req, res) => {
     try {
-        category.remove(req.params.id).then(del_res => {
+        sub_category.remove(req.params.id).then(del_res => {
             if (del_res.status)
                 return res.status(200).send({ result: 'success' })
             else
@@ -64,9 +64,9 @@ const del_specific_category = (req, res) => {
 
 }
 
-const update_specific_category = (req, res) => {
+const update_specific_sub_category = (req, res) => {
     try {
-        category.update(req.body).then(update_res => {
+        sub_category.update(req.body).then(update_res => {
             if (update_res.status)
                 return res.status(200).send({ result: 'success' })
             else
@@ -78,12 +78,11 @@ const update_specific_category = (req, res) => {
 }
 
 
-router.post('/', validate(categoryValidationRules), add)
-router.get('/', list_all_category)
-router.get('/:id', get_specific_category)
-router.put('/:id', update_specific_category)
-router.delete('/:id', del_specific_category)
-
+router.post('/', add)
+router.get('/:cat_id', list_all_sub_category)
+router.get('/:id', get_specific_sub_category)
+router.put('/:id', update_specific_sub_category)
+router.delete('/:id', del_specific_sub_category)
 
 module.exports = router
 

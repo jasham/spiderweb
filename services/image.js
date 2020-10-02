@@ -1,14 +1,27 @@
 const con = require('../helper/db')
+const fs = require('../helper/fs')
 
-const save_image = async (data) => {
+const save = async (data) => {
     try {
-        const save_img = await new con.image(data).save()
-        if(save_img){
-            return save_img
+        let fileObj = {
+            fileBase64: data.image_string,
+            ext: data.image_ext
         }
-    }catch(error){
-        console.log(error)
+        const imgSaveRes = await fs.uploadFile(fileObj)
+        if (imgSaveRes.status) {
+            delete data.image_string
+            delete data.image_ext
+            data.image_url = data.hostUrl + imgSaveRes.imgPath
+            delete data.hostUrl
+            const imgObj = await new con.image(data).save()
+            return { status: true, imgObj }
+        }
+        else // if error from fs file
+            imgSaveRes
+
+    } catch (error) {
+        return { status: false, error: error.toString() }
     }
 }
 
-module.exports = { save_image }
+module.exports = { save }

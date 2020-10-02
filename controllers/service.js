@@ -1,30 +1,49 @@
-const category = require('../services/category')
+const multer = require('multer')
+const path = require('path')
 const router = require('express').Router()
+const service = require('../services/service')
+const image = require('../services/image')
 const { validate } = require('../helper/model_validator')
-const { categoryValidationRules } = require('../helper/model_validator/category_validator')
+const { serviceValidationRules } = require('../helper/model_validator/service_mod')
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads');
+    },
+    filename: (req, file, cb) => {
+        console.log(file);
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
 
-const add = (req, res) => {
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+}
+const upload = multer({ storage: storage, fileFilter: fileFilter });
+
+add = (req, res) => {
     try {
-        category.save(req.body).then(save_res => {
+        service.save(req.body).then(save_res => {
             if (save_res.status === 'exist')
-                return res.status(200).send({ result: 'categoryExist' })
+                return res.status(200).send({ result: 'serviceExist' })
             else if (save_res.status)
                 return res.status(200).send({ result: 'success', data: save_res.save_res })
             else
                 return res.send({ result: 'fail', error: save_res.error, data: null })
-
         })
+
     } catch (error) {
         return res.send({ result: 'fail', error: error.toString(), data: null })
     }
-
 }
 
-const list_all_category = (req, res) => {
+list_all = (req, res) => {
     try {
-        let result_data
-        category.list().then(list => {
+        service.list(req.params.cat_id, req.params.sub_cat_id).then((list) => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.list })
             else
@@ -34,13 +53,11 @@ const list_all_category = (req, res) => {
         return res.send({ result: 'fail', error: error.toString(), data: null })
     }
 
-    // req.app.io.emit('notify_me','hello')
-    // global.io.sockets.in(global.users[1].userId).emit('notify_me', 'I am from user 1');
 }
 
-const get_specific_category = (req, res) => {
-
-    category.get_specific_category(req.params.id).then(data => {
+specific_list = (req, res) => {
+    // console.log("Here is request specific",req.params.id)
+    service.list_specific_services(req.params.id).then((data) => {
         if (data)
             return res.status(200).send(data)
         else {
@@ -50,9 +67,9 @@ const get_specific_category = (req, res) => {
     })
 }
 
-const del_specific_category = (req, res) => {
+del_specific_service = (req, res) => {
     try {
-        category.remove(req.params.id).then(del_res => {
+        service.remove(req.params.id).then((del_res) => {
             if (del_res.status)
                 return res.status(200).send({ result: 'success' })
             else
@@ -61,12 +78,11 @@ const del_specific_category = (req, res) => {
     } catch (error) {
         return res.send({ result: 'fail', error: error.toString() })
     }
-
 }
 
-const update_specific_category = (req, res) => {
+update_specific_service = (req, res) => {
     try {
-        category.update(req.body).then(update_res => {
+        service.update(req.body).then((update_res) => {
             if (update_res.status)
                 return res.status(200).send({ result: 'success' })
             else
@@ -78,15 +94,11 @@ const update_specific_category = (req, res) => {
 }
 
 
-router.post('/', validate(categoryValidationRules), add)
-router.get('/', list_all_category)
-router.get('/:id', get_specific_category)
-router.put('/:id', update_specific_category)
-router.delete('/:id', del_specific_category)
-
+router.post('/', add)
+router.get('/:cat_id/:sub_cat_id', list_all)
+//router.get('/:id', specific_list)
+router.put('/:id', update_specific_service)
+router.delete('/:id', del_specific_service)
 
 module.exports = router
-
-
-
 

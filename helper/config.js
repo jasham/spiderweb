@@ -1,6 +1,6 @@
 const config = {
-    secret : "thisistherealprojectoflife",
-    tokenLife : 180
+    secret : "spiderweb",
+    tokenLife : '60' // seconds
 }
 
 module.exports = {

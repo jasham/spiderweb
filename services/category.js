@@ -1,77 +1,59 @@
 const con = require('../helper/db')
 
-const save_category = async (data) => {
+const save = async (data) => {
     try {
+        const exist = await con.category.exists({ category: data.category, deleted: false })
+        if (exist)
+            return { status: 'exist' }
+
         const save_res = await new con.category(data).save()
         return { status: true, save_res }
     } catch (error) {
-        return { status: false, error }
+        return { status: false, error: error.toString() }
     }
 }
 
-const list_all_category = async () => {
+const list = async () => {
     try {
-        const list = await con.category.find({ deleted: false}, { __v: 0 })
+        const list = await con.category.find({ deleted: false }, { __v: 0 }).sort({ _id: -1 })
         return { status: true, list }
     } catch (error) {
-        return { status: false, error }
+        return { status: false, error: error.toString() }
     }
 }
 
-const list_specific_category = async (id) => {
+const remove = async (id) => {
     try {
-        const specific_category = await con.category.findOne({ _id: id })
-        if (specific_category) {
-            return
-        } else
-            return JSON.parse(JSON.stringify({ status: "no service" }))
-    } catch (error) {
-        console.log(error)
+        const del_service = await con.category.updateOne({ _id: id }, { deleted: true, active: false })
+        if (del_service.ok)
+            return { status: true }
+    }
+    catch (error) {
+        return { status: false, error: error.toString() }
     }
 }
 
-const delete_specific_category = async (id) => {
-    console.log("Here is data", id)
+const update = async (data) => {
     try {
-        const del_service = await con.service.deleteOne({ _id: id })
-
-        if (del_service) {
-            console.log("Here is data", del_service)
-            return del_service
+        const updateObj = {
+            category: data.category,
+            rut: Date.now()
         }
-    } catch (error) {
-        console.log("Here is error service_model delete id insuccessfull : ", id)
+        const update_category = await con.category.updateOne({ _id: data._id }, updateObj)
+        if (update_category.ok)
+            return { status: true }
     }
-}
-
-const patch_specific_category = async (req) => {
-    try {
-        let categoryData = {
-            category_name: req.body.category_name
-        }
-        const patch_category = await con.category.updateOne({ _id: req.params.id }, categoryData, function (err, docs) {
-            if (err) {
-                console.log(err)
-            }
-            else {
-                return docs
-            }
-        })
-        if (patch_category) {
-            return patch_category
-        }
-    } catch (error) {
-        console.log("Here is error service_model delete id insuccessfull : ", id)
+    catch (error) {
+        return { status: false, error: error.toString() }
     }
 }
 
 
 module.exports = {
-    save_category,
-    list_all_category,
-    list_specific_category,
-    delete_specific_category,
-    patch_specific_category
+    save,
+    list,
+    remove,
+    update
 }
 
 

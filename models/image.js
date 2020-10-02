@@ -1,11 +1,16 @@
 const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-const image = new mongoose.Schema({
-    image : {type : String},
-    service_id : {type : String},
-    item_id : {type : String},
-    category_id : {type : String},
-    sub_category_id : {type : String}
+const Image = new mongoose.Schema({
+    image_url : {type : String},
+    service_id : {type:Schema.Types.ObjectId},
+    item_id : {type : String , default:null},
+    category_id : {type:Schema.Types.ObjectId},
+    sub_category_id : {type:Schema.Types.ObjectId},
+    active: { type: Boolean, default: true },
+    deleted: { type: Boolean, default: false },
+    rct: { type: Date, default: new Date() },
+    rut: { type: Date, default:null }
 })
 
-module.exports = mongoose.model('Image',image)
+module.exports = mongoose.model('Image',Image,'Image')

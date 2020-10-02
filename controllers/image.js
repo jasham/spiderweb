@@ -1,18 +1,16 @@
-const category = require('../services/category')
+const image = require('../services/image')
 const router = require('express').Router()
-const { validate } = require('../helper/model_validator')
-const { categoryValidationRules } = require('../helper/model_validator/category_validator')
+
 
 
 const add = (req, res) => {
     try {
-        category.save(req.body).then(save_res => {
-            if (save_res.status === 'exist')
-                return res.status(200).send({ result: 'categoryExist' })
-            else if (save_res.status)
-                return res.status(200).send({ result: 'success', data: save_res.save_res })
+        req.body.hostUrl=req.headers.host
+        image.save(req.body).then(img_res => {
+            if (img_res.status)
+                return res.status(200).send({ result: 'success', data: img_res.imgObj })
             else
-                return res.send({ result: 'fail', error: save_res.error, data: null })
+                return res.send({ result: 'fail', error: img_res.error, data: null })
 
         })
     } catch (error) {
@@ -21,10 +19,10 @@ const add = (req, res) => {
 
 }
 
-const list_all_category = (req, res) => {
+const list_all_image = (req, res) => {
     try {
         let result_data
-        category.list().then(list => {
+        image.list().then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.list })
             else
@@ -38,9 +36,9 @@ const list_all_category = (req, res) => {
     // global.io.sockets.in(global.users[1].userId).emit('notify_me', 'I am from user 1');
 }
 
-const get_specific_category = (req, res) => {
+const get_specific_image = (req, res) => {
 
-    category.get_specific_category(req.params.id).then(data => {
+    image.get_specific_image(req.params.id).then(data => {
         if (data)
             return res.status(200).send(data)
         else {
@@ -50,9 +48,9 @@ const get_specific_category = (req, res) => {
     })
 }
 
-const del_specific_category = (req, res) => {
+const del_specific_image = (req, res) => {
     try {
-        category.remove(req.params.id).then(del_res => {
+        image.remove(req.params.id).then(del_res => {
             if (del_res.status)
                 return res.status(200).send({ result: 'success' })
             else
@@ -64,9 +62,9 @@ const del_specific_category = (req, res) => {
 
 }
 
-const update_specific_category = (req, res) => {
+const update_specific_image = (req, res) => {
     try {
-        category.update(req.body).then(update_res => {
+        image.update(req.body).then(update_res => {
             if (update_res.status)
                 return res.status(200).send({ result: 'success' })
             else
@@ -78,11 +76,11 @@ const update_specific_category = (req, res) => {
 }
 
 
-router.post('/', validate(categoryValidationRules), add)
-router.get('/', list_all_category)
-router.get('/:id', get_specific_category)
-router.put('/:id', update_specific_category)
-router.delete('/:id', del_specific_category)
+router.post('/', add)
+router.get('/', list_all_image)
+router.get('/:id', get_specific_image)
+router.put('/:id', update_specific_image)
+router.delete('/:id', del_specific_image)
 
 
 module.exports = router

@@ -21,9 +21,12 @@ const main = (req, res, next) => {
 
 module.exports = {
     main,
+    credential: require('../models/credential'),
     user: require('../models/user'),
     service: require('../models/service'),
     image: require('../models/image'),
     category: require('../models/category'),
-    sub_category: require('../models/sub_category')
+    sub_category: require('../models/sub_category'),
+    group: require('../models/group'),
+    image: require('../models/image')
 }
