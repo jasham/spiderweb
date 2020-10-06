@@ -15,7 +15,7 @@ const userSignUpValidator = [
         .not().isEmpty().withMessage('Password should not be empty.')
         .isLength({ min : 8, max : 30}).withMessage('Password length error. Min length is 8 and maximum is 30.')
         .trim(),
-    body('mobileno')
+    body('mobile')
         .not().isEmpty().withMessage('Mobile No should not be empty.')
         .isInt().withMessage('Mobile number incorrect.')
         .isLength({ min : 10, max : 30}).withMessage('Mobile no length error. Minimum length is 10.')
