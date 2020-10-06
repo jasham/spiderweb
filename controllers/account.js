@@ -1,6 +1,8 @@
 const { Router } = require('express');
 var router = Router()
 const accountService = require('../services/account')
+const { validate } = require('../helper/model_validator')
+const { userSignUpValidator } = require('../helper/model_validator/user_sign_up_validator')
 
 userLogin = (req, res) => {
     var result = 'fail'
@@ -107,7 +109,7 @@ vendorSignup = (req, res) => {
 
 router.post('/vendorlogin', vendorLogin)
 router.post('/userlogin', userLogin)
-router.post('/usersignup', userSignup)
+router.post('/usersignup',validate(userSignUpValidator),userSignup)
 router.post('/vendorsignup', vendorSignup)
 
 module.exports = router;
