@@ -1,7 +1,6 @@
 const sub_category = require('../services/sub_category')
 const router = require('express').Router()
 const { validate } = require('../helper/model_validator')
-//const { sub_categoryValidationRules } = require('../helper/model_validator/sub_category_validator')
 
 
 const add = (req, res) => {
@@ -13,7 +12,6 @@ const add = (req, res) => {
                 return res.status(200).send({ result: 'success', data: save_res.save_sub_cat })
             else
                 return res.send({ result: 'fail', error: save_res.error, data: null })
-
         })
     } catch (error) {
         return res.send({ result: 'fail', error: error.toString(), data: null })
@@ -33,13 +31,9 @@ const list_all_sub_category = (req, res) => {
     } catch (error) {
         return res.send({ result: 'fail', error: error.toString(), data: null })
     }
-
-    // req.app.io.emit('notify_me','hello')
-    // global.io.sockets.in(global.users[1].userId).emit('notify_me', 'I am from user 1');
 }
 
 const get_specific_sub_category = (req, res) => {
-
     sub_category.get_specific_sub_category(req.params.id).then(data => {
         if (data)
             return res.status(200).send(data)

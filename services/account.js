@@ -1,21 +1,20 @@
 const con = require('../helper/db')
 const auth = require('../helper/auth')
 const uuid = require('uuid')
-//const crypto=require('crypto')
 
 signup = async (data) => {
     try {
-        var recordExist
-        if (data.emailOrMobile.includes('@')) {
-            recordExist = await con.credential.exists({ email: data.email, deleted: true })
-            if (recordExist)
-                return { status: "emailExist" }
-        }
-        else {
-            recordExist = await con.credential.exists({ mobile: data.mobile, deleted: true })
-            if (recordExist)
-                return { status: "mobileExist" }
-        }
+        let recordExist
+        // if (data.emailOrMobile.includes('@')) {
+        recordExist = await con.credential.exists({ email: data.email, deleted: false })
+        if (recordExist)
+            return { status: "emailExist" }
+        // }
+        // else {
+        recordExist = await con.credential.exists({ mobile: data.mobile, deleted: false })
+        if (recordExist)
+            return { status: "mobileExist" }
+        // }
 
         data.uid = uuid.v4()
         let user = {}
@@ -48,9 +47,9 @@ login = async (data) => {
     try {
         var emailOrMobileExist, pwdExist, loginObj
         if (data.emailOrMobile.includes('@')) {
-            emailOrMobileExist = await con.credential.exists({ email: data.email, deleted: true })
+            emailOrMobileExist = await con.credential.exists({ email: data.email, deleted: false })
             if (emailOrMobileExist) {
-                pwdExist = await con.credential.exists({ password: data.password, deleted: true })
+                pwdExist = await con.credential.exists({ password: data.password, deleted: false })
                 if (pwdExist) {
                     loginObj = {
                         email: data.email,
@@ -68,9 +67,9 @@ login = async (data) => {
 
         }
         else {
-            emailOrMobileExist = await con.credential.exists({ mobile: data.mobile, deleted: true })
+            emailOrMobileExist = await con.credential.exists({ mobile: data.mobile, deleted: false })
             if (emailOrMobileExist) {
-                pwdExist = await con.credential.exists({ password: data.password, deleted: true })
+                pwdExist = await con.credential.exists({ password: data.password, deleted: false })
                 if (pwdExist) {
                     loginObj = {
                         mobile: data.mobile,

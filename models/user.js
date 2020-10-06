@@ -6,7 +6,7 @@ const User = new mongoose.Schema({
     dob: { type: Date },
     gender: { type: String },
     mobile: { type: String },
-    role: { type: Number },
+    role_id: { type: Number },
     credential_id: { type: Schema.Types.ObjectId }
 })
 
