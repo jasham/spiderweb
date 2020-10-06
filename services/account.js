@@ -5,17 +5,17 @@ const uuid = require('uuid')
 signup = async (data) => {
     try {
         let recordExist
-        // if (data.emailOrMobile.includes('@')) {
-        recordExist = await con.credential.exists({ email: data.email, deleted: false })
-        if (recordExist)
-            return { status: "emailExist" }
-        // }
-        // else {
-        recordExist = await con.credential.exists({ mobile: data.mobile, deleted: false })
-        if (recordExist)
-            return { status: "mobileExist" }
-        // }
-
+        if(data.email){
+            recordExist = await con.credential.exists({ email: data.email, deleted: false })
+            if (recordExist)
+                return { status: "emailExist" }
+        }
+        if(data.mobile){
+            recordExist = await con.credential.exists({ mobile: data.mobile, deleted: false })
+                if (recordExist)
+                    return { status: "mobileExist" }
+        }
+        
         data.uid = uuid.v4()
         let user = {}
         const saveCredential = await con.credential(data).save()
