@@ -30,8 +30,9 @@ signup = async (data) => {
             user["user_id"] = saveUser._id
             user["credential_id"] = saveCredential._id
             user["email"] = saveCredential.email
-            user["mobile"] = saveUser.mobile
+            user["mobile"] = saveCredential.mobile
             user["user_status"] = saveCredential.active
+            user["role_id"] = saveUser.role_id
             user["token"] = token
         }
         return { status: true, user }
@@ -136,12 +137,12 @@ vendorlogin = async (data) => {
     }
 }
 
-adminlogin = async (data) => {
+adminLogin = async (data) => {
     try {
         var emailOrMobileExist, pwdExist, loginObj
         if (data.emailOrMobile.includes('@')) {
-            emailOrMobileExist = await con.credential.exists({ email: data.emailOrMobile, deleted: false })
-            console.log("Here is data from signedup user",emailOrMobileExist)
+            emailOrMobileExist = await con.credential.find({ email: data.emailOrMobile, deleted: false })
+            console.log("Real Data ",emailOrMobileExist)
             if (emailOrMobileExist) {
                 pwdExist = await con.credential.exists({ password: data.password, deleted: false })
                 if (pwdExist) {
@@ -212,4 +213,5 @@ loginUserRecord = async (loginObj) => {
 module.exports = {
     signup,
     userlogin,
+    adminLogin
 }
