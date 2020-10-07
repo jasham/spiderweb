@@ -9,6 +9,8 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/MyApp' , 
         console.log(err, "hello 1998");
     });
 
+    
+
 
 const main = (req, res, next) => {
     if (mongoose.connection.readyState === 0) {

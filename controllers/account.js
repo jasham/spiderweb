@@ -107,9 +107,36 @@ vendorSignup = (req, res) => {
     })
 }
 
+adminSignUp = (req, res) => {
+    let result = 'fail'
+    req.body.role_id = 1
+    accountService.signup(req.body).then(user => {
+        if (user.status === 'emailExist') {
+            result = 'emailExist'
+            res.send({ msg: result, data: null })
+        }
+        else if (user.status === 'mobileExist') {
+            result = 'mobileExist'
+            res.send({ msg: result, data: null })
+        }
+        else if (user.status) {
+            result = 'success'
+            res.send({ msg: result, data: user.user })
+        }
+        else {
+            res.send({ msg: result, error: user.error, data: null })
+        }
+
+    }).catch(err => {
+        res.send({ msg: result, error: err.toString(), data: null })
+    })
+}
+
+
 router.post('/vendorlogin', vendorLogin)
 router.post('/userlogin', userLogin)
 router.post('/usersignup',validate(userSignUpValidator),userSignup)
-router.post('/vendorsignup', vendorSignup)
+router.post('/vendorsignup',validate(userSignUpValidator),vendorSignup)
+router.post('/adminsignup',validate(userSignUpValidator),adminSignUp)
 
 module.exports = router;
