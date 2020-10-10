@@ -41,7 +41,7 @@ signup = async (data) => {
     }
 }
 
-userlogin = async (data) => {
+login = async (data) => {
     try {
         var emailOrMobileExist, pwdExist, loginObj
         if (data.emailOrMobile.includes('@')) {
@@ -212,6 +212,6 @@ loginUserRecord = async (loginObj) => {
 
 module.exports = {
     signup,
-    userlogin,
+    login,
     adminLogin
 }
