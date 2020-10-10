@@ -5,7 +5,8 @@ const User = new mongoose.Schema({
     name: {type: String},
     dob: { type: Date },
     gender: { type: String },
-    role_id: { type: Number }
+    role_id: { type: Number },
+    credential_id : {type: Schema.Types.ObjectId},
 })
 
 module.exports = mongoose.model('User', User,'User')

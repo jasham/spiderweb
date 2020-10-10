@@ -188,7 +188,8 @@ adminLogin = async (data) => {
 loginUserRecord = async (loginObj) => {
     try {
         const getCredential = await con.credential.findOne(loginObj)
-        const getUser = await con.user.find({ credential_id: getCredential._id })
+        const getUser = await con.user.findOne({ credential_id: getCredential._id })
+        console.log("Here is user data",getUser)
         var user = {}
         let tokenObj = {
             _id: getUser._id,
