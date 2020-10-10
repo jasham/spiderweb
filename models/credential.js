@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 
 const Credential = new mongoose.Schema({
     password: { type: String },
-    email: { type: String },
-    mobile : {type : String},
+    email: { type : String, default: null },
+    mobile : {type : String, default: null},
     uid: { type: String },
     active: { type: Boolean, default: true },
     deleted: { type: Boolean, default: false },
