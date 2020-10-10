@@ -51,8 +51,7 @@ login = async (data) => {
                 if (pwdExist) {
                     loginObj = {
                         email: data.emailOrMobile,
-                        password: data.password,
-                        deleted: true
+                        password: data.password
                     }
                     const loginResult = loginUserRecord(loginObj)
                     return loginResult
@@ -71,8 +70,7 @@ login = async (data) => {
                 if (pwdExist) {
                     loginObj = {
                         mobile: data.emailOrMobile,
-                        password: data.password,
-                        deleted: true
+                        password: data.password
                     }
                     const loginResult = loginUserRecord(loginObj)
                     return loginResult
@@ -203,6 +201,7 @@ loginUserRecord = async (loginObj) => {
         user["mobile"] = getUser.mobile
         user["user_status"] = getCredential.active
         user["token"] = token
+        user["role_id"] = getUser.role_id
         return { status: true, user }
     } catch (error) {
         return { status: false, error: error.toString() }
