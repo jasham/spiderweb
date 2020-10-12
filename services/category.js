@@ -13,9 +13,16 @@ const save = async (data) => {
     }
 }
 
-const list = async () => {
+const list = async (id) => {
     try {
-        const list = await con.category.find({ deleted: false }, { __v: 0 }).sort({ _id: -1 })
+        let list 
+        if(id){
+           list = await con.category.findOne({ deleted: false, _id: id})
+           console.log("here in ninja 3",list)
+        }else{
+            list = await con.category.find({ deleted: false }, { __v: 0 }).sort({ _id: -1 })
+        }
+        
         return { status: true, list }
     } catch (error) {
         return { status: false, error: error.toString() }
@@ -35,11 +42,12 @@ const remove = async (id) => {
 
 const update = async (data) => {
     try {
+        console.log("Henery data",data)
         const updateObj = {
             category: data.category,
             rut: Date.now()
         }
-        const update_category = await con.category.updateOne({ _id: data._id }, updateObj)
+        const update_category = await con.category.updateOne({ _id: data.id }, updateObj)
         if (update_category.ok)
             return { status: true }
     }

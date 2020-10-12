@@ -7,17 +7,21 @@ checkAuthentication = (req, res, next) => {
   if (authHeader) {
     const token = authHeader.split(' ')[1]// Bearer <token>
     jwt.verify(token, config.config.secret, function (err, decoded) {
-      if (err) {
-
-        if (err.name === 'TokenExpiredError') {
+      if (err) {       
+        if (err.name === 'TokenExpiredError') {            
           // create new token
-          let newToken = createNewToken()
-          req.headers.authorization = newToken
+          let tokenObj = {
+            _id: req.headers.user_id,
+            uid: req.headers.uid
+        }
+          let newToken = createNewToken(tokenObj)
+          req.headers.authorization = newToken 
         }
 
         else if (err.name === 'JsonWebTokenError') {
         }
       }
+      
       next()
 
     })

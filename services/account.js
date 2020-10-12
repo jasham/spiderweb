@@ -33,6 +33,7 @@ signup = async (data) => {
             user["mobile"] = saveCredential.mobile
             user["user_status"] = saveCredential.active
             user["role_id"] = saveUser.role_id
+            user["uid"] = saveCredential.uid
             user["token"] = token
         }
         return { status: true, user }
@@ -189,7 +190,6 @@ loginUserRecord = async (loginObj) => {
     try {
         const getCredential = await con.credential.findOne(loginObj)
         const getUser = await con.user.findOne({ credential_id: getCredential._id })
-        console.log("Here is user data",getUser)
         var user = {}
         let tokenObj = {
             _id: getUser._id,
@@ -201,8 +201,10 @@ loginUserRecord = async (loginObj) => {
         user["email"] = getCredential.email
         user["mobile"] = getUser.mobile
         user["user_status"] = getCredential.active
-        user["token"] = token
+        user["uid"] = getCredential.uid
         user["role_id"] = getUser.role_id
+        user["token"] = token
+        
         return { status: true, user }
     } catch (error) {
         return { status: false, error: error.toString() }

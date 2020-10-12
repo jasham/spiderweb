@@ -22,7 +22,7 @@ const add = (req, res) => {
 const list_all_sub_category = (req, res) => {
     try {
         let result_data
-        sub_category.list(req.params.cat_id).then(list => {
+        sub_category.list().then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.list })
             else
@@ -34,14 +34,17 @@ const list_all_sub_category = (req, res) => {
 }
 
 const get_specific_sub_category = (req, res) => {
-    sub_category.get_specific_sub_category(req.params.id).then(data => {
-        if (data)
-            return res.status(200).send(data)
-        else {
-            result = 'fail'
-            res.send()
-        }
-    })
+    try {
+        let result_data
+        sub_category.list(req.params.id).then(list => {
+            if (list.status)
+                return res.status(200).send({ result: 'success', data: list.list })
+            else
+                return res.status(200).send({ result: 'fail', data: null, error: list.error })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
 }
 
 const del_specific_sub_category = (req, res) => {
@@ -59,6 +62,7 @@ const del_specific_sub_category = (req, res) => {
 }
 
 const update_specific_sub_category = (req, res) => {
+    req.body.id = req.params.id
     try {
         sub_category.update(req.body).then(update_res => {
             if (update_res.status)
@@ -73,7 +77,7 @@ const update_specific_sub_category = (req, res) => {
 
 
 router.post('/', add)
-router.get('/:cat_id', list_all_sub_category)
+router.get('/', list_all_sub_category)
 router.get('/:id', get_specific_sub_category)
 router.put('/:id', update_specific_sub_category)
 router.delete('/:id', del_specific_sub_category)

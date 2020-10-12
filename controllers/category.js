@@ -25,6 +25,7 @@ const list_all_category = (req, res) => {
     try {
         let result_data
         category.list().then(list => {
+            console.log("Here is list",list)
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.list })
             else
@@ -39,8 +40,9 @@ const list_all_category = (req, res) => {
 }
 
 const get_specific_category = (req, res) => {
-
-    category.get_specific_category(req.params.id).then(data => {
+    console.log("I am called")
+    category.list(req.params.id).then(data => {
+        console.log("Here is data",data)
         if (data)
             return res.status(200).send(data)
         else {
@@ -65,7 +67,9 @@ const del_specific_category = (req, res) => {
 }
 
 const update_specific_category = (req, res) => {
+    req.body.id = req.params.id
     try {
+        
         category.update(req.body).then(update_res => {
             if (update_res.status)
                 return res.status(200).send({ result: 'success' })
