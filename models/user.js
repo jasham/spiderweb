@@ -3,8 +3,8 @@ const Schema = mongoose.Schema
 
 const User = new mongoose.Schema({
     name: {type: String},
-    dob: { type: Date },
-    gender: { type: String },
+    dob: { type: Date,default:null },
+    gender: { type: String,default:null },
     role_id: { type: Number },
     credential_id : {type: Schema.Types.ObjectId},
 })

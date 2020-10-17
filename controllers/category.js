@@ -23,11 +23,13 @@ const add = (req, res) => {
 
 const list_all_category = (req, res) => {
     try {
-        let result_data
-        category.list().then(list => {
-            console.log("Here is list",list)
+        let obj = eval('(' + req.query.query + ')')
+        let jsonStr = JSON.stringify(obj)
+        queryParams = JSON.parse(jsonStr)
+        
+        category.list(queryParams).then(list => {
             if (list.status)
-                return res.status(200).send({ result: 'success', data: list.list })
+                return res.status(200).send({ result: 'success', data: list.record })
             else
                 return res.status(200).send({ result: 'fail', data: null, error: list.error })
         })
@@ -42,7 +44,7 @@ const list_all_category = (req, res) => {
 const get_specific_category = (req, res) => {
     console.log("I am called")
     category.list(req.params.id).then(data => {
-        console.log("Here is data",data)
+        console.log("Here is data", data)
         if (data)
             return res.status(200).send(data)
         else {
@@ -69,7 +71,7 @@ const del_specific_category = (req, res) => {
 const update_specific_category = (req, res) => {
     req.body.id = req.params.id
     try {
-        
+
         category.update(req.body).then(update_res => {
             if (update_res.status)
                 return res.status(200).send({ result: 'success' })
