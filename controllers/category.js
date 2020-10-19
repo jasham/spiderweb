@@ -7,10 +7,14 @@ const { categoryValidationRules } = require('../helper/model_validator/category_
 const add = (req, res) => {
     try {
         category.save(req.body).then(save_res => {
-            if (save_res.status === 'exist')
-                return res.status(200).send({ result: 'categoryExist' })
-            else if (save_res.status)
-                return res.status(200).send({ result: 'success', data: save_res.save_res })
+            if (save_res.status)
+                return res.status(200).send({ 
+                    result: 'success', 
+                    data: { 
+                        save_record : save_res.save_record , 
+                        exist_category : save_res.exist_category 
+                    } 
+                })
             else
                 return res.send({ result: 'fail', error: save_res.error, data: null })
 
@@ -69,12 +73,16 @@ const del_specific_category = (req, res) => {
 }
 
 const update_specific_category = (req, res) => {
-    req.body.id = req.params.id
     try {
-
         category.update(req.body).then(update_res => {
             if (update_res.status)
-                return res.status(200).send({ result: 'success' })
+                return res.status(200).send({ 
+                    result: 'success', 
+                    data : {
+                        exist_record : update_res.exist_category, 
+                        updated_record : update_res.update_record 
+                    } 
+                })
             else
                 return res.status(200).send({ result: 'fail', error: update_res.error })
         })
@@ -84,10 +92,10 @@ const update_specific_category = (req, res) => {
 }
 
 
-router.post('/', validate(categoryValidationRules), add)
+router.post('/', add)
 router.get('/', list_all_category)
 router.get('/:id', get_specific_category)
-router.put('/:id', update_specific_category)
+router.post('/update/', update_specific_category)
 router.delete('/:id', del_specific_category)
 
 
