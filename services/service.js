@@ -16,10 +16,15 @@ const save = async (data) => {
     }
 }
 
-const list = async (cat_id, sub_cat_id) => {
+const list = async (queryParams) => {
     try {
-        const list = await con.service.find({ category_id: cat_id, sub_category_id: sub_cat_id, deleted: false }, { __v: 0 }).sort({ _id: -1 })
-        return { status: true, list }
+        let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
+        let qry = { deleted: false, sub_category_id: queryParams.sub_category_id, service: { $regex: '.*' + queryParams.search + '.*', $options: 'i' } }
+        const serviceList = await con.service.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ id: -1 })
+        const totalRecords = await con.service.countDocuments(qry)
+      
+        return { status: true, record: { service: serviceList, totalRecords, currentPage: queryParams.currentPage } }
+
     } catch (error) {
         return { status: false, error: error.toString() }
     }

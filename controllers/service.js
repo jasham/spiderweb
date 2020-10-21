@@ -6,24 +6,6 @@ const image = require('../services/image')
 const { validate } = require('../helper/model_validator')
 const { serviceValidationRules } = require('../helper/model_validator/service_mod')
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads');
-    },
-    filename: (req, file, cb) => {
-        console.log(file);
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png') {
-        cb(null, true);
-    } else {
-        cb(null, false);
-    }
-}
-const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 add = (req, res) => {
     try {
@@ -43,9 +25,13 @@ add = (req, res) => {
 
 list_all = (req, res) => {
     try {
-        service.list(req.params.cat_id, req.params.sub_cat_id).then((list) => {
+        let obj = eval('(' + req.query.query + ')')
+        let jsonStr = JSON.stringify(obj)
+        queryParams = JSON.parse(jsonStr)
+
+        service.list(queryParams).then((list) => {
             if (list.status)
-                return res.status(200).send({ result: 'success', data: list.list })
+                return res.status(200).send({ result: 'success', data: list.record })
             else
                 return res.status(200).send({ result: 'fail', data: null, error: list.error })
         })
@@ -95,7 +81,7 @@ update_specific_service = (req, res) => {
 
 
 router.post('/', add)
-router.get('/:cat_id/:sub_cat_id', list_all)
+router.get('/', list_all)
 //router.get('/:id', specific_list)
 router.put('/:id', update_specific_service)
 router.delete('/:id', del_specific_service)

@@ -8,12 +8,12 @@ const add = (req, res) => {
     try {
         category.save(req.body).then(save_res => {
             if (save_res.status)
-                return res.status(200).send({ 
-                    result: 'success', 
-                    data: { 
-                        save_record : save_res.save_record , 
-                        exist_category : save_res.exist_category 
-                    } 
+                return res.status(200).send({
+                    result: 'success',
+                    data: {
+                        save_category: save_res.saved,
+                        exist_category: save_res.exists
+                    }
                 })
             else
                 return res.send({ result: 'fail', error: save_res.error, data: null })
@@ -30,7 +30,7 @@ const list_all_category = (req, res) => {
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
         queryParams = JSON.parse(jsonStr)
-        
+       
         category.list(queryParams).then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.record })
@@ -60,7 +60,7 @@ const get_specific_category = (req, res) => {
 
 const del_specific_category = (req, res) => {
     try {
-        category.remove(req.params.id).then(del_res => {
+        category.remove(req.body).then(del_res => {
             if (del_res.status)
                 return res.status(200).send({ result: 'success' })
             else
@@ -76,12 +76,12 @@ const update_specific_category = (req, res) => {
     try {
         category.update(req.body).then(update_res => {
             if (update_res.status)
-                return res.status(200).send({ 
-                    result: 'success', 
-                    data : {
-                        exist_record : update_res.exist_category, 
-                        updated_record : update_res.update_record 
-                    } 
+                return res.status(200).send({
+                    result: 'success',
+                    data: {
+                        exist_category: update_res.exists,
+                        update_category: update_res.updated
+                    }
                 })
             else
                 return res.status(200).send({ result: 'fail', error: update_res.error })
@@ -95,8 +95,8 @@ const update_specific_category = (req, res) => {
 router.post('/', add)
 router.get('/', list_all_category)
 router.get('/:id', get_specific_category)
-router.post('/update/', update_specific_category)
-router.delete('/:id', del_specific_category)
+router.post('/update', update_specific_category)
+router.post('/delete', del_specific_category)
 
 
 module.exports = router

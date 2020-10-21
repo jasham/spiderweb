@@ -21,10 +21,13 @@ const add = (req, res) => {
 
 const list_all_sub_category = (req, res) => {
     try {
-        let result_data
-        sub_category.list().then(list => {
+        let obj = eval('(' + req.query.query + ')')
+        let jsonStr = JSON.stringify(obj)
+        queryParams = JSON.parse(jsonStr)
+
+        sub_category.list(queryParams).then(list => {
             if (list.status)
-                return res.status(200).send({ result: 'success', data: list.list })
+                return res.status(200).send({ result: 'success', data: list.record })
             else
                 return res.status(200).send({ result: 'fail', data: null, error: list.error })
         })
