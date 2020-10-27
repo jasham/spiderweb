@@ -7,7 +7,7 @@ const save = async (data) => {
             return { status: 'exist' }
         data = {
             ...data,
-            amount: Number(data.amount)
+            amount: data.amount ? Number(data.amount) : null
         }
         const save_res = await new con.service(data).save()
         return { status: true, save_res }
@@ -58,7 +58,7 @@ const update = async (data) => {
     try {
         const updateObj = {
             service: data.service,
-            amount: Number(data.amount),
+            amount: data.amount ? Number(data.amount)  : null ,
             description: data.description,
             rut: Date.now()
         }

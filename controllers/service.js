@@ -83,7 +83,7 @@ update_specific_service = (req, res) => {
 router.post('/', add)
 router.get('/', list_all)
 //router.get('/:id', specific_list)
-router.put('/:id', update_specific_service)
+router.put('/', update_specific_service)
 router.delete('/:id', del_specific_service)
 
 module.exports = router

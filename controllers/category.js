@@ -95,8 +95,8 @@ const update_specific_category = (req, res) => {
 router.post('/', add)
 router.get('/', list_all_category)
 router.get('/:id', get_specific_category)
-router.post('/update', update_specific_category)
-router.post('/delete', del_specific_category)
+router.post('/update/', update_specific_category)
+router.post('/delete/', del_specific_category)
 
 
 module.exports = router

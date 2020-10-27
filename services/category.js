@@ -49,8 +49,10 @@ const list = async (queryParams) => {
 const remove = async (ids) => {
     try {
         let count = 0
+        console.log("Here is data id",ids)
         if (ids.length > 0) {
             for (let i = 0; i < ids.length; i++) {
+                console.log("Here is specific id",ids[i]._id)
                 const del_service = await con.category.updateOne({ _id: ids[i]._id }, { deleted: true, active: false })
                 count++
             }
