@@ -3,10 +3,10 @@ const router = require('express').Router()
 
 
 
-const add = (req, res) => {
+const add_service_image = (req, res) => {
     try {
         req.body.hostUrl=req.headers.host
-        image.save(req.body).then(img_res => {
+        image.saveServiceImage(req.body).then(img_res => {
             if (img_res.status)
                 return res.status(200).send({ result: 'success', data: img_res.imgObj })
             else
@@ -19,7 +19,7 @@ const add = (req, res) => {
 
 }
 
-const list_all_image = (req, res) => {
+const list_all_image = (req, res) => {//work is in progress
     try {
         let result_data
         image.list().then(list => {
@@ -76,8 +76,8 @@ const update_specific_image = (req, res) => {
 }
 
 
-router.post('/', add)
-router.get('/', list_all_image)
+router.post('/service_image', add_service_image)
+router.get('/service_image', list_all_image)
 router.get('/:id', get_specific_image)
 router.put('/:id', update_specific_image)
 router.delete('/:id', del_specific_image)

@@ -20,26 +20,13 @@ const list = async (queryParams) => {
     try {
         let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
         let qry = { deleted: false, sub_category_id: queryParams.sub_category_id, service: { $regex: '.*' + queryParams.search + '.*', $options: 'i' } }
-        const serviceList = await con.service.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ id: -1 })
+        const serviceList = await con.service.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
         const totalRecords = await con.service.countDocuments(qry)
       
         return { status: true, record: { service: serviceList, totalRecords, currentPage: queryParams.currentPage } }
 
     } catch (error) {
         return { status: false, error: error.toString() }
-    }
-}
-
-const list_specific_services = async (id) => {
-    try {
-        const specific_service = await con.service.findOne({ _id: id })
-        console.log("Here is data hand", specific_service)
-        if (specific_service) {
-            return
-        } else
-            return JSON.parse(JSON.stringify({ status: "no service" }))
-    } catch (error) {
-        console.log(error)
     }
 }
 
@@ -56,9 +43,13 @@ const remove = async (id) => {
 
 const update = async (data) => {
     try {
+        const exist = await con.service.exists({ service: data.service, deleted: false, _id: { $nin: data._id } })  
+        if (exist)
+            return { status: 'exist' }
+
         const updateObj = {
             service: data.service,
-            amount: data.amount ? Number(data.amount)  : null ,
+            amount: data.amount ? Number(data.amount)  : 0 ,
             description: data.description,
             rut: Date.now()
         }
@@ -73,7 +64,6 @@ const update = async (data) => {
 
 module.exports = {
     save,
-    list,
     list,
     remove,
     update
