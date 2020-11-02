@@ -6,7 +6,6 @@ const image = require('../services/image')
 const { validate } = require('../helper/model_validator')
 const { serviceValidationRules } = require('../helper/model_validator/service_mod')
 
-
 add = (req, res) => {
     try {
         service.save(req.body).then(save_res => {
@@ -17,7 +16,6 @@ add = (req, res) => {
             else
                 return res.send({ result: 'fail', error: save_res.error, data: null })
         })
-
     } catch (error) {
         return res.send({ result: 'fail', error: error.toString(), data: null })
     }
