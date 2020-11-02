@@ -23,7 +23,7 @@ const list = async (queryParams) => {
         let finalArray = []
         let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
         let qry = { deleted: false, category_id: queryParams.category_id, sub_category: { $regex: '.*' + queryParams.search + '.*', $options: 'i' } }
-        const sub_cat = await con.sub_category.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ id: -1 })
+        const sub_cat = await con.sub_category.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
         const totalRecords = await con.sub_category.countDocuments(qry)
         if (sub_cat.length > 0) {
 
@@ -42,11 +42,10 @@ const list = async (queryParams) => {
 
 const remove = async (id) => {
     try {
-
         const del_service = await con.sub_category.updateOne({ _id: id }, { deleted: true, active: false })
-        console.log("Here is ninja", del_service)
         if (del_service.ok)
-            return { status: true }
+            await con.service.updateMany({ sub_category_id: _id }, { deleted: true, active: false })
+        return { status: true }
     }
     catch (error) {
         return { status: false, error: error.toString() }
@@ -55,12 +54,16 @@ const remove = async (id) => {
 
 const update = async (data) => {
     try {
+        const exist = await con.sub_category.exists({ sub_category: data.sub_category, deleted: false, _id: { $nin: data._id } })
+        if (exist)
+            return { status: 'exist' }
+
         const updateObj = {
             sub_category: data.sub_category,
             category_id: data.category_id,
             rut: Date.now()
         }
-        const update_sub_category = await con.sub_category.updateOne({ _id: data.id }, updateObj)
+        const update_sub_category = await con.sub_category.updateOne({ _id: data._id }, updateObj)
         if (update_sub_category.ok) {
             const grpObj = {
                 group_name: data.sub_category

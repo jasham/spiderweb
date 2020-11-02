@@ -24,7 +24,6 @@ const list_all_sub_category = (req, res) => {
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
         queryParams = JSON.parse(jsonStr)
-        console.log("Here is ninja",queryParams)
         sub_category.list(queryParams).then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.record })
@@ -35,20 +34,6 @@ const list_all_sub_category = (req, res) => {
         return res.send({ result: 'fail', error: error.toString(), data: null })
     }
 }
-
-// const get_specific_sub_category = (req, res) => {
-//     try {
-//         let result_data
-//         sub_category.list(req.params.id).then(list => {
-//             if (list.status)
-//                 return res.status(200).send({ result: 'success', data: list.list })
-//             else
-//                 return res.status(200).send({ result: 'fail', data: null, error: list.error })
-//         })
-//     } catch (error) {
-//         return res.send({ result: 'fail', error: error.toString(), data: null })
-//     }
-// }
 
 const del_specific_sub_category = (req, res) => {
     try {
@@ -65,10 +50,12 @@ const del_specific_sub_category = (req, res) => {
 }
 
 const update_specific_sub_category = (req, res) => {
-    req.body.id = req.params.id
+    //req.body.id = req.params.id
     try {
         sub_category.update(req.body).then(update_res => {
-            if (update_res.status)
+            if (update_res.status === 'exist')
+                return res.status(200).send({ result: 'subCategoryExist' })
+            else if (update_res.status)
                 return res.status(200).send({ result: 'success' })
             else
                 return res.status(200).send({ result: 'fail', error: update_res.error })
@@ -81,7 +68,7 @@ const update_specific_sub_category = (req, res) => {
 
 router.post('/', add)
 router.get('/', list_all_sub_category)
-router.put('/:id', update_specific_sub_category)
+router.put('/', update_specific_sub_category)
 router.delete('/:id', del_specific_sub_category)
 
 module.exports = router

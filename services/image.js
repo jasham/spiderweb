@@ -1,7 +1,7 @@
 const con = require('../helper/db')
 const fs = require('../helper/fs')
 
-const save = async (data) => {
+const saveServiceImage = async (data) => {
     try {
         let fileObj = {
             fileBase64: data.image_string,
@@ -24,4 +24,4 @@ const save = async (data) => {
     }
 }
 
-module.exports = { save }
+module.exports = { saveServiceImage }

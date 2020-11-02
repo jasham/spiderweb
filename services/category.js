@@ -29,7 +29,7 @@ const list = async (queryParams) => {
         let finalArray = []
         let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
         let qry = { deleted: false, category: { $regex: '.*' + queryParams.search + '.*', $options: 'i' } }
-        const cat = await con.category.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ id: -1 })
+        const cat = await con.category.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
         const totalRecords = await con.category.countDocuments(qry)
         if (cat.length > 0) {
 
@@ -49,11 +49,13 @@ const list = async (queryParams) => {
 const remove = async (ids) => {
     try {
         let count = 0
-        console.log("Here is data id",ids)
         if (ids.length > 0) {
             for (let i = 0; i < ids.length; i++) {
-                console.log("Here is specific id",ids[i]._id)
                 const del_service = await con.category.updateOne({ _id: ids[i]._id }, { deleted: true, active: false })
+                if(del_service.ok===1){
+                    await con.sub_category.updateMany({ category_id: ids[i]._id }, { deleted: true, active: false })
+                    await con.service.updateMany({ category_id: ids[i]._id }, { deleted: true, active: false })
+                }
                 count++
             }
         }

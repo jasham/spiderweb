@@ -46,19 +46,6 @@ const list_all_category = (req, res) => {
     // global.io.sockets.in(global.users[1].userId).emit('notify_me', 'I am from user 1');
 }
 
-const get_specific_category = (req, res) => {
-    console.log("I am called")
-    category.list(req.params.id).then(data => {
-        console.log("Here is data", data)
-        if (data)
-            return res.status(200).send(data)
-        else {
-            result = 'fail'
-            res.send()
-        }
-    })
-}
-
 const del_specific_category = (req, res) => {
     try {
         category.remove(req.body).then(del_res => {
@@ -95,7 +82,6 @@ const update_specific_category = (req, res) => {
 
 router.post('/', add)
 router.get('/', list_all_category)
-router.get('/:id', get_specific_category)
 router.post('/update/', update_specific_category)
 router.post('/delete/', del_specific_category)
 
