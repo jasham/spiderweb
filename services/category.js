@@ -1,4 +1,5 @@
 const con = require('../helper/db')
+const image = require('../services/image')
 
 const save = async (data) => {
     try {
@@ -32,10 +33,10 @@ const list = async (queryParams) => {
         const cat = await con.category.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
         const totalRecords = await con.category.countDocuments(qry)
         if (cat.length > 0) {
-
             for (let i = 0; i < cat.length; i++) {
                 let obj = { ...cat[i].toObject() }
                 obj.sub_category_count = await con.sub_category.countDocuments({ category_id: cat[i]._id, deleted: false })
+                obj.category_image_count = await con.image.countDocuments({ category_id: cat[i]._id, deleted: false })
                 finalArray.push(obj)
             }
         }
@@ -52,7 +53,7 @@ const remove = async (ids) => {
         if (ids.length > 0) {
             for (let i = 0; i < ids.length; i++) {
                 const del_service = await con.category.updateOne({ _id: ids[i]._id }, { deleted: true, active: false })
-                if(del_service.ok===1){
+                if (del_service.ok === 1) {
                     await con.sub_category.updateMany({ category_id: ids[i]._id }, { deleted: true, active: false })
                     await con.service.updateMany({ category_id: ids[i]._id }, { deleted: true, active: false })
                 }
@@ -98,12 +99,32 @@ const update = async (data) => {
     }
 }
 
+const categoryImage = async (data) => {
+    try {
+        const img_res = await image.save_cat_sub_service(data)
+        return img_res
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
+const listImage = async (queryParams) => {
+    try {
+        const img_res = await image.list_cat_sub_service(queryParams)
+        return img_res
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
 
 module.exports = {
     save,
     list,
     remove,
-    update
+    update,
+    categoryImage,
+    listImage
 }
 
 

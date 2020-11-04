@@ -1,5 +1,3 @@
-const multer = require('multer')
-const path = require('path')
 const router = require('express').Router()
 const service = require('../services/service')
 const image = require('../services/image')
@@ -7,7 +5,7 @@ const { validate } = require('../helper/model_validator')
 const { serviceValidationRules } = require('../helper/model_validator/service_mod')
 
 
-add = (req, res) => {
+const add = (req, res) => {
     try {
         service.save(req.body).then(save_res => {
             if (save_res.status === 'exist')
@@ -23,7 +21,7 @@ add = (req, res) => {
     }
 }
 
-list_all = (req, res) => {
+const list_all = (req, res) => {
     try {
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
@@ -41,7 +39,7 @@ list_all = (req, res) => {
 
 }
 
-del_specific_service = (req, res) => {
+const del_specific_service = (req, res) => {
     try {
         service.remove(req.params.id).then((del_res) => {
             if (del_res.status)
@@ -54,7 +52,7 @@ del_specific_service = (req, res) => {
     }
 }
 
-update_specific_service = (req, res) => {
+const update_specific_service = (req, res) => {
     try {
         service.update(req.body).then((update_res) => {
             if (save_res.status === 'exist')
@@ -69,11 +67,43 @@ update_specific_service = (req, res) => {
     }
 }
 
+const upload_image = (req, res) => {
+    try {
+        service.serviceImage(req.body).then(img_res => {
+            if (img_res.status)
+                return res.status(200).send({ result: 'success', data: img_res.imgObj })
+            else
+                return res.send({ result: 'fail', error: img_res.error, data: null })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
+const list_image = (req, res) => {
+    try {
+        let obj = eval('(' + req.query.query + ')')
+        let jsonStr = JSON.stringify(obj)
+        queryParams = JSON.parse(jsonStr)
+
+        service.listImage(queryParams).then(list => {
+            if (list.status)
+                return res.status(200).send({ result: 'success', data: list.record })
+            else
+                return res.status(200).send({ result: 'fail', data: null, error: list.error })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
 
 router.post('/', add)
 router.get('/', list_all)
 router.put('/', update_specific_service)
 router.delete('/:id', del_specific_service)
+router.post('/service_image', upload_image)
+router.get('/service_image', list_image)
 
 module.exports = router
 
