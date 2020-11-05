@@ -1,8 +1,6 @@
 const image = require('../services/image')
 const router = require('express').Router()
 
-
-
 const add_service_image = (req, res) => {
     try {
         req.body.hostUrl=req.headers.host
