@@ -1,4 +1,5 @@
 const con = require('../helper/db')
+const image = require('../services/image')
 
 const save = async (data) => {
     try {
@@ -26,10 +27,10 @@ const list = async (queryParams) => {
         const sub_cat = await con.sub_category.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
         const totalRecords = await con.sub_category.countDocuments(qry)
         if (sub_cat.length > 0) {
-
             for (let i = 0; i < sub_cat.length; i++) {
                 let obj = { ...sub_cat[i].toObject() }
                 obj.service_count = await con.service.countDocuments({ sub_category_id: sub_cat[i]._id, deleted: false })
+                obj.sub_category_image_count = await con.image.countDocuments({ sub_category_id: sub_cat[i]._id, deleted: false })
                 finalArray.push(obj)
             }
         }
@@ -79,12 +80,32 @@ const update = async (data) => {
     }
 }
 
+const subCategoryImage = async (data) => {
+    try {
+        const img_res = await image.save_cat_sub_service(data)
+        return img_res
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
+const listImage = async (queryParams) => {
+    try {
+        const img_res = await image.list_cat_sub_service(queryParams)
+        return img_res
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
 
 module.exports = {
     save,
     list,
     remove,
-    update
+    update,
+    subCategoryImage,
+    listImage
 }
 
 

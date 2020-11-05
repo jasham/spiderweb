@@ -1,4 +1,5 @@
 const con = require('../helper/db')
+const image = require('../services/image')
 
 const save = async (data) => {
     try {
@@ -18,12 +19,19 @@ const save = async (data) => {
 
 const list = async (queryParams) => {
     try {
+        let finalArray = []
         let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
         let qry = { deleted: false, sub_category_id: queryParams.sub_category_id, service: { $regex: '.*' + queryParams.search + '.*', $options: 'i' } }
         const serviceList = await con.service.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
         const totalRecords = await con.service.countDocuments(qry)
-      
-        return { status: true, record: { service: serviceList, totalRecords, currentPage: queryParams.currentPage } }
+        if (serviceList.length > 0) {
+            for (let i = 0; i < serviceList.length; i++) {
+                let obj = { ...serviceList[i].toObject() }
+                obj.service_image_count = await con.image.countDocuments({ service_id: serviceList[i]._id, deleted: false })
+                finalArray.push(obj)
+            }
+        }    
+        return { status: true, record: { service: finalArray, totalRecords, currentPage: queryParams.currentPage } }
 
     } catch (error) {
         return { status: false, error: error.toString() }
@@ -62,10 +70,30 @@ const update = async (data) => {
     }
 }
 
+const serviceImage = async (data) => {
+    try {
+        const img_res = await image.save_cat_sub_service(data)
+        return img_res
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
+const listImage = async (queryParams) => {
+    try {
+        const img_res = await image.list_cat_sub_service(queryParams)
+        return img_res
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
 module.exports = {
     save,
     list,
     remove,
-    update
+    update,
+    serviceImage,
+    listImage
 }
 

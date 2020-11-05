@@ -3,6 +3,7 @@ const Schema = mongoose.Schema
 
 const Image = new mongoose.Schema({
     image_url : {type : String},
+    type : {type : String},
     service_id : {type:Schema.Types.ObjectId},
     item_id : {type : String , default:null},
     category_id : {type:Schema.Types.ObjectId},

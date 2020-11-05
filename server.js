@@ -14,7 +14,7 @@ app.use(express.static('uploads'))
 app.io = io
 server.listen(port,()=>{
     console.log('API server started on: ',port)
-});
+})
 
 
 

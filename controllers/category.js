@@ -31,7 +31,7 @@ const list_all_category = (req, res) => {
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
         queryParams = JSON.parse(jsonStr)
-       
+
         category.list(queryParams).then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.record })
@@ -79,11 +79,43 @@ const update_specific_category = (req, res) => {
     }
 }
 
+const upload_image = (req, res) => {
+    try {
+        category.categoryImage(req.body).then(img_res => {
+            if (img_res.status)
+                return res.status(200).send({ result: 'success', data: img_res.imgObj })
+            else
+                return res.send({ result: 'fail', error: img_res.error, data: null })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
+const list_image = (req, res) => {
+    try {
+        let obj = eval('(' + req.query.query + ')')
+        let jsonStr = JSON.stringify(obj)
+        queryParams = JSON.parse(jsonStr)
+
+        category.listImage(queryParams).then(list => {
+            if (list.status)
+                return res.status(200).send({ result: 'success', data: list.record })
+            else
+                return res.status(200).send({ result: 'fail', data: null, error: list.error })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
 
 router.post('/', add)
 router.get('/', list_all_category)
-router.post('/update/', update_specific_category)
-router.post('/delete/', del_specific_category)
+router.post('/update', update_specific_category)
+router.post('/delete', del_specific_category)
+router.post('/category_image', upload_image)
+router.get('/category_image', list_image)
 
 
 module.exports = router
