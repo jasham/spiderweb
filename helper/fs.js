@@ -7,9 +7,9 @@ const upload = async (fileObj) => {//'fileObj' receive as object
             fileObj.fileBase64 = fileObj.fileBase64.split('base64,').pop()
     }
     try {
-        const file_uid = uuid.v4()
-        fs.writeFileSync('./uploads/' + file_uid + fileObj.ext, fileObj.fileBase64, { encoding: 'base64' })
-        const path = '/uploads/' + file_uid + fileObj.ext
+        const file_uid = uuid.v4() 
+        fs.writeFileSync(`./uploads/${fileObj.repository}/` + file_uid + fileObj.ext, fileObj.fileBase64, { encoding: 'base64' })
+        const path = `/${fileObj.repository}/` + file_uid + fileObj.ext
         return { status: true, imgPath: path }
     }
     catch (err) {

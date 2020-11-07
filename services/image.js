@@ -5,7 +5,8 @@ const save_cat_sub_service = async (data) => {
     try {
         let fileObj = {
             fileBase64: data.image_string,
-            ext: data.image_ext
+            ext: data.image_ext,
+            repository:data.repository
         }
         const imgSaveRes = await fs.uploadFile(fileObj)
         if (imgSaveRes.status) {

@@ -81,6 +81,8 @@ const update_specific_category = (req, res) => {
 
 const upload_image = (req, res) => {
     try {
+        req.body.hostUrl=req.headers.host
+        req.body.repository="images"
         category.categoryImage(req.body).then(img_res => {
             if (img_res.status)
                 return res.status(200).send({ result: 'success', data: img_res.imgObj })

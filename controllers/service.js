@@ -68,6 +68,8 @@ const update_specific_service = (req, res) => {
 
 const upload_image = (req, res) => {
     try {
+        req.body.hostUrl=req.headers.host
+        req.body.repository="images"
         service.serviceImage(req.body).then(img_res => {
             if (img_res.status)
                 return res.status(200).send({ result: 'success', data: img_res.imgObj })
