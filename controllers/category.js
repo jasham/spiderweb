@@ -31,7 +31,6 @@ const list_all_category = (req, res) => {
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
         queryParams = JSON.parse(jsonStr)
-
         category.list(queryParams).then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.record })
@@ -80,6 +79,8 @@ const update_specific_category = (req, res) => {
 }
 
 const upload_image = (req, res) => {
+    console.log("Here is req",res)
+
     try {
         req.body.hostUrl=req.headers.host
         req.body.repository="images"
@@ -99,6 +100,7 @@ const list_image = (req, res) => {
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
         queryParams = JSON.parse(jsonStr)
+        console.log("Here is query params",queryParams)
 
         category.listImage(queryParams).then(list => {
             if (list.status)
