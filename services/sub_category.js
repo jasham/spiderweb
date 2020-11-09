@@ -85,7 +85,7 @@ const subCategoryImage = async (data) => {
         const img_res = await image.save_cat_sub_service(data)
         return img_res
     } catch (error) {
-        return res.send({ result: 'fail', error: error.toString(), data: null })
+        return { status: false, error: error.toString() }
     }
 }
 
@@ -94,7 +94,7 @@ const listImage = async (queryParams) => {
         const img_res = await image.list_cat_sub_service(queryParams)
         return img_res
     } catch (error) {
-        return res.send({ result: 'fail', error: error.toString(), data: null })
+        return { status: false, error: error.toString() }
     }
 }
 
@@ -103,7 +103,7 @@ const deleteImage = async (_id) => {
         const img_res = await image.remove_cat_sub_service(_id)
         return img_res
     } catch (error) {
-        return res.send({ result: 'fail', error: error.toString(), data: null })
+        return { status: false, error: error.toString() }
     }
 }
 
