@@ -13,6 +13,7 @@ const save_cat_sub_service = async (data) => {
             delete data.image_string
             delete data.image_ext
             data.image_url = data.hostUrl + imgSaveRes.imgPath
+            data.image_name = imgSaveRes.image_name
             delete data.hostUrl
             const imgObj = await new con.image(data).save()
             return { status: true, imgObj }
@@ -46,21 +47,31 @@ const list_cat_sub_service = async (queryParams) => {
 
 const remove_cat_sub_service = async (image_id) => {
     try {
-
-        const del_service = await con.category.findById(image_id,{})
-        if (del_service.ok === 1) {
-            await con.sub_category.updateMany({ category_id: ids[i]._id }, { deleted: true, active: false })
-            await con.service.updateMany({ category_id: ids[i]._id }, { deleted: true, active: false })
+        const existImage = await con.image.findById(image_id)
+        if (existImage) {
+            let fileObj = {
+                fileName: existImage.image_name,
+                repository: 'images'
+            }
+            const imgDelRes = await fs.deleteFile(fileObj)
+            if (imgDelRes.status) {
+                const detImg = await con.image.findByIdAndDelete(image_id)
+                if (detImg)
+                    return { status: true }
+            }
+            else
+                return imgDelRes          
         }
-        return { status: true }
+        return { status: true, error: 'somthing wrong to find image object to delete image' }
     }
     catch (error) {
-        return { status: false, error: error.toString() }
+            return { status: false, error: error.toString() }
+        }
     }
-}
 
 
 module.exports = {
-    save_cat_sub_service,
-    list_cat_sub_service
-}
+        save_cat_sub_service,
+        list_cat_sub_service,
+        remove_cat_sub_service
+    }

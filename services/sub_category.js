@@ -45,7 +45,7 @@ const remove = async (id) => {
     try {
         const del_service = await con.sub_category.updateOne({ _id: id }, { deleted: true, active: false })
         if (del_service.ok)
-            await con.service.updateMany({ sub_category_id: _id }, { deleted: true, active: false })
+            await con.service.updateMany({ sub_category_id: id }, { deleted: true, active: false })
         return { status: true }
     }
     catch (error) {
@@ -98,6 +98,16 @@ const listImage = async (queryParams) => {
     }
 }
 
+const deleteImage = async (_id) => {
+    try {
+        const img_res = await image.remove_cat_sub_service(_id)
+        return img_res
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
+
 
 module.exports = {
     save,
@@ -105,7 +115,8 @@ module.exports = {
     remove,
     update,
     subCategoryImage,
-    listImage
+    listImage,
+    deleteImage
 }
 
 

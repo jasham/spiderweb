@@ -88,12 +88,23 @@ const listImage = async (queryParams) => {
     }
 }
 
+const deleteImage = async (_id) => {
+    try {
+        const img_res = await image.remove_cat_sub_service(_id)
+        return img_res
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
+
 module.exports = {
     save,
     list,
     remove,
     update,
     serviceImage,
-    listImage
+    listImage,
+    deleteImage
 }
 
