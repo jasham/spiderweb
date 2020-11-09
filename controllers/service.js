@@ -69,7 +69,7 @@ const update_specific_service = (req, res) => {
 const upload_image = (req, res) => {
     try {
         req.body.hostUrl = req.protocol + '://' + req.get('host')
-        req.body.repository = "images"
+        req.body.repository = 'images'
         service.serviceImage(req.body).then(img_res => {
             if (img_res.status)
                 return res.status(200).send({ result: 'success', data: img_res.imgObj })
@@ -98,6 +98,20 @@ const list_image = (req, res) => {
     }
 }
 
+const del_service_image = (req, res) => {
+    try {
+        service.deleteImage(req.params.id).then(del_res => {
+            if (del_res.status)
+                return res.status(200).send({ result: 'success' })
+            else
+                return res.status(200).send({ result: 'fail', error: del_res.error })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString() })
+    }
+
+}
+
 
 router.post('/', add)
 router.get('/', list_all)
@@ -105,6 +119,7 @@ router.put('/', update_specific_service)
 router.delete('/:id', del_specific_service)
 router.post('/service_image', upload_image)
 router.get('/service_image', list_image)
+router.delete('/service_image/:id',del_service_image)
 
 module.exports = router
 

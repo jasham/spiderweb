@@ -98,12 +98,38 @@ const listImage = async (queryParams) => {
     }
 }
 
+const deleteImage = async (_id) => {
+    try {
+        const img_res = await image.remove_cat_sub_service(_id)
+        return img_res
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
 const listDetailedSubCategory = async () => {
     try {
-        const sub_cat = await con.sub_category.find().sort({ _id: -1 })
-        const totalRecords = await con.sub_category.countDocuments(qry)
-    }catch(error){
-        return res.send({ result: 'fail', error: error.toString(), data: null })
+        const sub_cat = await con.sub_category.aggregate([
+            {
+                $lookup: {
+                    from: "Image", // collection name in db
+                    localField: "_id",
+                    foreignField: "sub_category_id",
+                    as: "image"
+
+                }
+            },
+            {
+                $project: {
+                    sub_category: 1,
+                    "image" : [ "image"]
+                }
+            }
+        ])
+        console.log("Detailed sub category", sub_cat)
+        return { status: true, sub_cat }
+    } catch (error) {
+        return { status: false, error: error.toString() }
     }
 }
 
@@ -115,7 +141,8 @@ module.exports = {
     update,
     subCategoryImage,
     listImage,
-    listDetailedSubCategory
+    deleteImage,
+    listDetailedSubCategory,
 }
 
 

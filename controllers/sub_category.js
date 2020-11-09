@@ -67,7 +67,7 @@ const update_specific_sub_category = (req, res) => {
 const upload_image = (req, res) => {
     try {
         rreq.body.hostUrl = req.protocol + '://' + req.get('host')
-        req.body.repository = "images"
+        req.body.repository = 'images'
         sub_category.subCategoryImage(req.body).then(img_res => {
             if (img_res.status)
                 return res.status(200).send({ result: 'success', data: img_res.imgObj })
@@ -96,6 +96,21 @@ const list_image = (req, res) => {
     }
 }
 
+const del_sub_category_image = (req, res) => {
+    try {
+        sub_category.deleteImage(req.params.id).then(del_res => {
+            if (del_res.status)
+                return res.status(200).send({ result: 'success' })
+            else
+                return res.status(200).send({ result: 'fail', error: del_res.error })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString() })
+    }
+
+}
+
+
 
 router.post('/', add)
 router.get('/', list_all_sub_category)
@@ -103,6 +118,7 @@ router.put('/', update_specific_sub_category)
 router.delete('/:id', del_specific_sub_category)
 router.post('/sub_category_image', upload_image)
 router.get('/sub_category_image', list_image)
+router.delete('/sub_category_image/:id',del_sub_category_image)
 
 module.exports = router
 
