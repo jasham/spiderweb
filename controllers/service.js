@@ -56,7 +56,7 @@ const update_specific_service = (req, res) => {
         service.update(req.body).then((update_res) => {
             if (save_res.status === 'exist')
                 return res.status(200).send({ result: 'serviceExist' })
-           else if (update_res.status)
+            else if (update_res.status)
                 return res.status(200).send({ result: 'success' })
             else
                 return res.status(200).send({ result: 'fail', error: update_res.error })
@@ -68,8 +68,8 @@ const update_specific_service = (req, res) => {
 
 const upload_image = (req, res) => {
     try {
-        req.body.hostUrl=req.headers.host
-        req.body.repository="images"
+        req.body.hostUrl = req.protocol + '://' + req.get('host')
+        req.body.repository = "images"
         service.serviceImage(req.body).then(img_res => {
             if (img_res.status)
                 return res.status(200).send({ result: 'success', data: img_res.imgObj })
