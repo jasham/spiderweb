@@ -6,7 +6,7 @@ const save_cat_sub_service = async (data) => {
         let fileObj = {
             fileBase64: data.image_string,
             ext: data.image_ext,
-            repository:data.repository
+            repository: data.repository
         }
         const imgSaveRes = await fs.uploadFile(fileObj)
         if (imgSaveRes.status) {
@@ -40,6 +40,21 @@ const list_cat_sub_service = async (queryParams) => {
         return { status: true, record: { image, totalRecords, currentPage: queryParams.currentPage } }
 
     } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
+const remove_cat_sub_service = async (image_id) => {
+    try {
+
+        const del_service = await con.category.findById(image_id,{})
+        if (del_service.ok === 1) {
+            await con.sub_category.updateMany({ category_id: ids[i]._id }, { deleted: true, active: false })
+            await con.service.updateMany({ category_id: ids[i]._id }, { deleted: true, active: false })
+        }
+        return { status: true }
+    }
+    catch (error) {
         return { status: false, error: error.toString() }
     }
 }
