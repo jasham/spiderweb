@@ -54,7 +54,7 @@ const del_specific_service = (req, res) => {
 const update_specific_service = (req, res) => {
     try {
         service.update(req.body).then((update_res) => {
-            if (save_res.status === 'exist')
+            if (update_res.status === 'exist')
                 return res.status(200).send({ result: 'serviceExist' })
             else if (update_res.status)
                 return res.status(200).send({ result: 'success' })
