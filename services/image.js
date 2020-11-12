@@ -49,18 +49,21 @@ const remove_cat_sub_service = async (image_id) => {
     try {
         const existImage = await con.image.findById(image_id)
         if (existImage) {
-            let fileObj = {
-                fileName: existImage.image_name,
-                repository: 'images'
-            }
-            const imgDelRes = await fs.deleteFile(fileObj)
-            if (imgDelRes.status) {
+            // if (imgDelRes.status) {
                 const detImg = await con.image.findByIdAndDelete(image_id)
+                let fileObj = {
+                    fileName: existImage.image_name,
+                    repository: 'images'
+                }
+                fs.deleteFile(fileObj)
+                // const imgDelRes = await 
                 if (detImg)
                     return { status: true }
-            }
-            else
-                return imgDelRes
+                
+                return { status: false }
+            // }
+            // else
+            //     return imgDelRes
         }
         return { status: false, error: 'somthing wrong to find image object to delete image' }
     }
