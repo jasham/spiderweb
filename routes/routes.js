@@ -10,5 +10,6 @@ router.use('/api/v1/sub_category', main, checkAuthentication, require('../contro
 router.use('/api/v1/service', main, checkAuthentication, require('../controllers/service'))
 router.use('/api/v1/image', main, checkAuthentication, require('../controllers/image'))
 router.use('/api/v1/socket', main, checkAuthentication, require('../controllers/socket'))
+router.use('/api/v1/user/sub_category', main, require('../controllers/user_end/sub_category'))
 
 module.exports = router

@@ -54,6 +54,7 @@ const remove = async (id) => {
 }
 
 const update = async (data) => {
+    console.log("Here is id", data._id)
     try {
         const exist = await con.sub_category.exists({ sub_category: data.sub_category, deleted: false, _id: { $nin: data._id } })
         if (exist)
@@ -124,13 +125,45 @@ const deleteImage = async (_id) => {
     }
 }
 
-const activeImage = async (image_id,_id,img,type) => {
+const activeImage = async (image_id, _id, img, type) => {
     try {
-        const img_res = await image.active_cat_sub_service(image_id,_id,img,type)
+        const img_res = await image.active_cat_sub_service(image_id, _id, img, type)
         return img_res
     } catch (error) {
         return { status: false, error: error.toString() }
     }
+}
+
+const listDetailedSubCategory = async () => {
+    try {
+        let sub_cat = await con.sub_category.find({ active: true, deleted: false })
+        if (sub_cat.length > 0) {
+            for (let i = 0; i < sub_cat.length; i++) {
+                let sub_cat_rel_img = await con.image.find({ sub_category_id: sub_cat[i]._id, deleted: false, active: true })
+                let tempObj = {}
+                if (sub_cat_rel_img.length > 0) {
+                    sub_cat_rel_img.map((data) => {
+                        if (data.type === "icon") {
+                            tempObj = { icon_url: data.image_url, ...tempObj }
+                        } else if (data.type === "banner") {
+                            tempObj = { banner_url: data.image_url, ...tempObj }
+                        }
+                    })
+                }
+                if (!tempObj.icon_url) {
+                    tempObj = { icon_url: null, ...tempObj }
+                }
+                if (!tempObj.banner_url) {
+                    tempObj = { banner_url: null, ...tempObj }
+                }
+                sub_cat[i] = { ...tempObj, ...sub_cat[i].toObject() }
+            }
+        }
+        return { status: true, sub_cat }
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+
 }
 
 
@@ -143,7 +176,8 @@ module.exports = {
     subCategoryImage,
     listImage,
     deleteImage,
-    activeImage
+    activeImage,
+    listDetailedSubCategory
 }
 
 
