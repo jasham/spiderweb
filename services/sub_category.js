@@ -80,6 +80,23 @@ const update = async (data) => {
     }
 }
 
+const active = async (id, active_status) => {
+    try {
+        let status
+        if (active_status === 'true')
+            status = true
+        else
+            status = false
+
+        const update_active_status = await con.sub_category.updateOne({ _id: id }, { active: status })
+        if (update_active_status.ok)
+            return { status: true }
+
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
 const subCategoryImage = async (data) => {
     try {
         const img_res = await image.save_cat_sub_service(data)
@@ -107,6 +124,14 @@ const deleteImage = async (_id) => {
     }
 }
 
+const activeImage = async (image_id,_id,img,type) => {
+    try {
+        const img_res = await image.active_cat_sub_service(image_id,_id,img,type)
+        return img_res
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
 
 
 module.exports = {
@@ -114,9 +139,11 @@ module.exports = {
     list,
     remove,
     update,
+    active,
     subCategoryImage,
     listImage,
-    deleteImage
+    deleteImage,
+    activeImage
 }
 
 

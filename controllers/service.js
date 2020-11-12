@@ -66,6 +66,20 @@ const update_specific_service = (req, res) => {
     }
 }
 
+const active = async (req, res) => {
+    try {
+        service.active(req.params.id,req.params.status).then(update_status => {
+            if (update_status.status)
+                return res.status(200).send({ result: 'success' })
+            else
+                return res.status(200).send({ result: 'fail', error: update_status.error })
+        })
+    }
+    catch (error) {
+        return res.send({ result: 'fail', error: error.toString() })
+    }
+}
+
 const upload_image = (req, res) => {
     try {
         req.body.hostUrl = req.protocol + '://' + req.get('host')
@@ -112,14 +126,30 @@ const del_service_image = (req, res) => {
 
 }
 
+const active_image = async (req, res) => {
+    try {
+        service.activeImage(req.params.id,req.params.service_id,req.params.image,req.params.type).then(status => {
+            if (status.status)
+                return res.status(200).send({ result: 'success' })
+            else
+                return res.status(200).send({ result: 'fail', error: status.error })
+        })
+    }
+    catch (error) {
+        return res.send({ result: 'fail', error: error.toString() })
+    }
+}
+
 
 router.post('/', add)
 router.get('/', list_all)
 router.put('/', update_specific_service)
 router.delete('/:id', del_specific_service)
+router.get('/active/:id/:status', active)
 router.post('/service_image', upload_image)
 router.get('/service_image', list_image)
 router.delete('/service_image/:id',del_service_image)
+router.get('/service_image/active/:id/:service_id/:image/:type', active_image)
 
 module.exports = router
 

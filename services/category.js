@@ -92,9 +92,25 @@ const update = async (data) => {
         // if (count === data.length) {
         return { status: true, exists, updated }
         //}
-
     }
     catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
+const active = async (id, active_status) => {
+    try {
+        let status
+        if (active_status === 'true')
+            status = true
+        else
+            status = false
+
+        const update_active_status = await con.category.updateOne({ _id: id }, { active: status })
+        if (update_active_status.ok)
+            return { status: true }
+
+    } catch (error) {
         return { status: false, error: error.toString() }
     }
 }
@@ -126,15 +142,26 @@ const deleteImage = async (_id) => {
     }
 }
 
+const activeImage = async (image_id, _id, img,type) => {
+    try {
+        const img_res = await image.active_cat_sub_service(image_id, _id, img,type)
+        return img_res
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
 
 module.exports = {
     save,
     list,
     remove,
     update,
+    active,
     categoryImage,
     listImage,
-    deleteImage
+    deleteImage,
+    activeImage
 }
 
 

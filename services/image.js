@@ -60,18 +60,42 @@ const remove_cat_sub_service = async (image_id) => {
                     return { status: true }
             }
             else
-                return imgDelRes          
+                return imgDelRes
         }
-        return { status: true, error: 'somthing wrong to find image object to delete image' }
+        return { status: false, error: 'somthing wrong to find image object to delete image' }
     }
     catch (error) {
-            return { status: false, error: error.toString() }
-        }
+        return { status: false, error: error.toString() }
     }
+}
+
+const active_cat_sub_service = async (image_id, _id, image,type) => {
+    try {
+        let qry = {}
+        if (image === 'category')
+            qry = { category_id: _id,type:type }
+        else if (image === 'sub_category')
+            qry = { sub_category_id: _id,type:type }
+        else//service
+            qry = { service_id: _id ,type:type}
+
+        const updateFalse = await con.image.updateMany(qry, { active: false })
+        if (updateFalse.ok) {
+            const updateTrue = await con.image.findByIdAndUpdate(image_id, { active: true, rut: new Date() })
+            console.log("updateTrue=", updateTrue)
+            return { status: true }
+        }
+        return { status: false, error: 'somthing wrong to update image status false' }
+    }
+    catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
 
 
 module.exports = {
-        save_cat_sub_service,
-        list_cat_sub_service,
-        remove_cat_sub_service
-    }
+    save_cat_sub_service,
+    list_cat_sub_service,
+    remove_cat_sub_service,
+    active_cat_sub_service
+}

@@ -57,7 +57,6 @@ const del_specific_category = (req, res) => {
     } catch (error) {
         return res.send({ result: 'fail', error: error.toString() })
     }
-
 }
 
 const update_specific_category = (req, res) => {
@@ -79,10 +78,25 @@ const update_specific_category = (req, res) => {
     }
 }
 
+const active = async (req, res) => {
+    try {
+        category.active(req.params.id,req.params.status).then(update_status => {
+            if (update_status.status)
+                return res.status(200).send({ result: 'success' })
+            else
+                return res.status(200).send({ result: 'fail', error: update_status.error })
+        })
+    }
+    catch (error) {
+        return res.send({ result: 'fail', error: error.toString() })
+    }
+}
+
+
 const upload_image = (req, res) => {
     try {
-        req.body.hostUrl=req.protocol + '://'+req.get('host')
-        req.body.repository='images'
+        req.body.hostUrl = req.protocol + '://' + req.get('host')
+        req.body.repository = 'images'
         category.categoryImage(req.body).then(img_res => {
             if (img_res.status)
                 return res.status(200).send({ result: 'success', data: img_res.imgObj })
@@ -125,14 +139,30 @@ const del_category_image = (req, res) => {
 
 }
 
+const active_image = async (req, res) => {
+    try {
+        category.activeImage(req.params.id,req.params.category_id,req.params.image,req.params.type).then(status => {
+            if (status.status)
+                return res.status(200).send({ result: 'success' })
+            else
+                return res.status(200).send({ result: 'fail', error: status.error })
+        })
+    }
+    catch (error) {
+        return res.send({ result: 'fail', error: error.toString() })
+    }
+}
+
 
 router.post('/', add)
 router.get('/', list_all_category)
 router.post('/update', update_specific_category)
 router.post('/delete', del_specific_category)
+router.get('/active/:id/:status', active)
 router.post('/category_image', upload_image)
 router.get('/category_image', list_image)
-router.delete('/category_image/:id',del_category_image)
+router.delete('/category_image/:id', del_category_image)
+router.get('/category_image/active/:id/:category_id/:image/:type', active_image)
 
 
 module.exports = router

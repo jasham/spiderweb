@@ -30,7 +30,7 @@ const list = async (queryParams) => {
                 obj.service_image_count = await con.image.countDocuments({ service_id: serviceList[i]._id, deleted: false })
                 finalArray.push(obj)
             }
-        }    
+        }
         return { status: true, record: { service: finalArray, totalRecords, currentPage: queryParams.currentPage } }
 
     } catch (error) {
@@ -51,13 +51,13 @@ const remove = async (id) => {
 
 const update = async (data) => {
     try {
-        const exist = await con.service.exists({ service: data.service, deleted: false, _id: { $nin: data._id } })  
+        const exist = await con.service.exists({ service: data.service, deleted: false, _id: { $nin: data._id } })
         if (exist)
             return { status: 'exist' }
 
         const updateObj = {
             service: data.service,
-            amount: data.amount ? Number(data.amount)  : 0 ,
+            amount: data.amount ? Number(data.amount) : 0,
             description: data.description,
             rut: Date.now()
         }
@@ -66,6 +66,23 @@ const update = async (data) => {
             return { status: true }
     }
     catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
+const active = async (id, active_status) => {
+    try {
+        let status
+        if (active_status === 'true')
+            status = true
+        else
+            status = false
+
+        const update_active_status = await con.service.updateOne({ _id: id }, { active: status })
+        if (update_active_status.ok)
+            return { status: true }
+
+    } catch (error) {
         return { status: false, error: error.toString() }
     }
 }
@@ -97,14 +114,25 @@ const deleteImage = async (_id) => {
     }
 }
 
+const activeImage = async (image_id, _id, img,type) => {
+    try {
+        const img_res = await image.active_cat_sub_service(image_id, _id, img,type)
+        return img_res
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
 
 module.exports = {
     save,
     list,
     remove,
     update,
+    active,
     serviceImage,
     listImage,
-    deleteImage
+    deleteImage,
+    activeImage
 }
 
