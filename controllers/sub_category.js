@@ -49,7 +49,6 @@ const del_specific_sub_category = (req, res) => {
 }
 
 const update_specific_sub_category = (req, res) => {
-    //req.body.id = req.params.id
     try {
         sub_category.update(req.body).then(update_res => {
             if (update_res.status === 'exist')

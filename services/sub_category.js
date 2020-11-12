@@ -54,6 +54,7 @@ const remove = async (id) => {
 }
 
 const update = async (data) => {
+    console.log("Here is id",data._id)
     try {
         const exist = await con.sub_category.exists({ sub_category: data.sub_category, deleted: false, _id: { $nin: data._id } })
         if (exist)
@@ -109,24 +110,30 @@ const deleteImage = async (_id) => {
 
 const listDetailedSubCategory = async () => {
     try {
-        const sub_cat = await con.sub_category.aggregate([
-            {
-                $lookup: {
-                    from: "Image", // collection name in db
-                    localField: "_id",
-                    foreignField: "sub_category_id",
-                    as: "image"
-
+        let sub_cat = await con.sub_category.find({ active : true, deleted: false })
+        if(sub_cat.length > 0){
+            for (let i = 0; i < sub_cat.length; i++) {
+                let sub_cat_rel_img = await con.image.find({ sub_category_id: sub_cat[i]._id, deleted: false, active : true })
+                let tempObj = {}
+                if(sub_cat_rel_img.length > 0){
+                    sub_cat_rel_img.map((data) => {
+                        console.log("Here is subcategory url",data)
+                        if(data.type === "icon"){
+                            tempObj = { icon_url : data.image_url, ...tempObj }
+                        }else if(data.type === "banner"){
+                            tempObj = { banner_url : data.image_url, ...tempObj }
+                        }
+                    })
                 }
-            },
-            {
-                $project: {
-                    sub_category: 1,
-                    "image" : [ "image"]
+                if(!tempObj.icon_url){
+                    tempObj = { icon_url : null, ...tempObj }
                 }
+                if(!tempObj.banner_url){
+                    tempObj = { banner_url : null, ...tempObj }
+                }
+                sub_cat[i] = { ...tempObj , ...sub_cat[i].toObject() }
             }
-        ])
-        console.log("Detailed sub category", sub_cat)
+        }
         return { status: true, sub_cat }
     } catch (error) {
         return { status: false, error: error.toString() }
