@@ -93,8 +93,6 @@ const active = async (req, res) => {
 
 
 const upload_image = (req, res) => {
-    console.log("Here is req",res)
-
     try {
         req.body.hostUrl = req.protocol + '://' + req.get('host')
         req.body.repository = 'images'
