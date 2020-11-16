@@ -49,21 +49,16 @@ const remove_cat_sub_service = async (image_id) => {
     try {
         const existImage = await con.image.findById(image_id)
         if (existImage) {
-            // if (imgDelRes.status) {
             const detImg = await con.image.findByIdAndDelete(image_id)
             let fileObj = {
                 fileName: existImage.image_name,
                 repository: 'images'
             }
-            fs.deleteFile(fileObj)
-            // const imgDelRes = await 
+            
+            const imgDelRes = await fs.deleteFile(fileObj)
             if (detImg)
                 return { status: true }
-            
             return { status: false }
-            // }
-            // else
-            //     return imgDelRes
         }
         return { status: false, error: 'somthing wrong to find image object to delete image' }
     }
@@ -72,7 +67,7 @@ const remove_cat_sub_service = async (image_id) => {
     }
 }
 
-const active_cat_sub_service = async (image_id, _id, image,type) => {
+const active_cat_sub_service = async (image_id, _id, image,type,activeStatus) => {
     try {
         let qry = {}
         if (image === 'category')
@@ -84,7 +79,7 @@ const active_cat_sub_service = async (image_id, _id, image,type) => {
 
         const updateFalse = await con.image.updateMany(qry, { active: false })
         if (updateFalse.ok) {
-            const updateTrue = await con.image.findByIdAndUpdate(image_id, { active: true, rut: new Date() })
+            const updateTrue = await con.image.findByIdAndUpdate(image_id, { active: activeStatus, rut: new Date() })
             return { status: true }
         }
         return { status: false, error: 'somthing wrong to update image status false' }
