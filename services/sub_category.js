@@ -43,10 +43,12 @@ const list = async (queryParams) => {
 
 const remove = async (id) => {
     try {
-        const del_service = await con.sub_category.updateOne({ _id: id }, { deleted: true, active: false })
-        if (del_service.ok)
+        const del_service = await con.sub_category.findOneAndUpdate({ _id: id }, { deleted: true, active: false }, { new: true })
+        if (del_service) {
             await con.service.updateMany({ sub_category_id: id }, { deleted: true, active: false })
-        return { status: true }
+            await con.group.updateOne({ _id: del_service.group_id }, { deleted: true, active: false })
+            return { status: true }
+        }
     }
     catch (error) {
         return { status: false, error: error.toString() }
@@ -54,7 +56,6 @@ const remove = async (id) => {
 }
 
 const update = async (data) => {
-    console.log("Here is id", data._id)
     try {
         const exist = await con.sub_category.exists({ sub_category: data.sub_category, deleted: false, _id: { $nin: data._id } })
         if (exist)
@@ -89,9 +90,12 @@ const active = async (id, active_status) => {
         else
             status = false
 
-        const update_active_status = await con.sub_category.updateOne({ _id: id }, { active: status })
-        if (update_active_status.ok)
-            return { status: true }
+        const update_active_status = await con.sub_category.findOneAndUpdate({ _id: id }, { active: status }, { new: true })
+        if (update_active_status) {
+            const update_grp_active = await con.group.updateOne({ _id: update_active_status.group_id }, { active: status })
+            if (update_grp_active.ok)
+                return { status: true }
+        }
 
     } catch (error) {
         return { status: false, error: error.toString() }

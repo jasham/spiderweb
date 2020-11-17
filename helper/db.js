@@ -31,5 +31,6 @@ module.exports = {
     category: require('../models/category'),
     sub_category: require('../models/sub_category'),
     group: require('../models/group'),
-    image: require('../models/image')
+    image: require('../models/image'),
+    vendor_group: require('../models/vendor_group'),
 }
