@@ -3,6 +3,7 @@ const router = require('express').Router()
 
 
 const add = (req, res) => {
+    console.log("Here is reached add")
     try {
         vendor.save(req.body).then(save_res => {
             if (save_res.status === 'exist')
@@ -22,6 +23,7 @@ const list_all_sub_cat_grp = (req, res) => {
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
         queryParams = JSON.parse(jsonStr)
+        console.log("Here is query params",queryParams)
         vendor.list(queryParams).then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.record })

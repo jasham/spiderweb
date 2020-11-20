@@ -17,8 +17,9 @@ const save = async (data) => {
 const list = async (queryParams) => {
     try {
         let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
-        let qry = { deleted: false, vendor_id: queryParams.vendor_id, sub_category: { $regex: '.*' + queryParams.search + '.*', $options: 'i' } }
+        let qry = { deleted: false, vendor_id: queryParams.vendor_id }
         const ved_grp = await con.vendor_group.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
+        console.log("Here is vendor group",ved_grp)
         const totalRecords = await con.vendor_group.countDocuments(qry)
 
         return { status: true, record: { vendor_group: ved_grp, totalRecords, currentPage: queryParams.currentPage } }
