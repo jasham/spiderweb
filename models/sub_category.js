@@ -8,7 +8,8 @@ const SubCategory = mongoose.Schema({
     active: { type: Boolean, default: true },
     deleted: { type: Boolean, default: false },
     rct: { type: Date, default: new Date() },
-    rut: { type: Date, default:null }
+    rut: { type: Date, default:null },
+    amount : { type : Number }
 })
 
 module.exports = mongoose.model('SubCategory', SubCategory,'SubCategory')

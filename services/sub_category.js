@@ -8,10 +8,11 @@ const save = async (data) => {
             return { status: 'exist' }
 
         const grpObj = {
-            group_name: data.sub_category
+            group_name: data.sub_category,
         }
         const save_grp = await new con.group(grpObj).save()
         data.group_id = save_grp._id
+        data.amount = data.amount ? Number(data.amount) : 0
         const save_sub_cat = await new con.sub_category(data).save()
         return { status: true, save_sub_cat }
     } catch (error) {
@@ -64,6 +65,7 @@ const update = async (data) => {
         const updateObj = {
             sub_category: data.sub_category,
             category_id: data.category_id,
+            amount: data.amount ? Number(data.amount) : 0,
             rut: Date.now()
         }
         const update_sub_category = await con.sub_category.updateOne({ _id: data._id }, updateObj)
@@ -143,7 +145,9 @@ const listDetailedSubCategory = async () => {
         let sub_cat = await con.sub_category.find({ active: true, deleted: false })
         if (sub_cat.length > 0) {
             for (let i = 0; i < sub_cat.length; i++) {
+                let sub_cat_services = await con.service.find({ sub_category_id: sub_cat[i]._id, deleted: false, active: true },{ service : 1, amount : 1, description : 1, sub_category_id : 1})
                 let sub_cat_rel_img = await con.image.find({ sub_category_id: sub_cat[i]._id, deleted: false, active: true })
+                console.log("Here is service list",sub_cat_services)
                 let tempObj = {}
                 if (sub_cat_rel_img.length > 0) {
                     sub_cat_rel_img.map((data) => {
@@ -160,7 +164,7 @@ const listDetailedSubCategory = async () => {
                 if (!tempObj.banner_url) {
                     tempObj = { banner_url: null, ...tempObj }
                 }
-                sub_cat[i] = { ...tempObj, ...sub_cat[i].toObject() }
+                sub_cat[i] = { ...tempObj, service : [...sub_cat_services], ...sub_cat[i].toObject() }
             }
         }
         return { status: true, sub_cat }

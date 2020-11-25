@@ -8,7 +8,7 @@ const save = async (data) => {
             return { status: 'exist' }
         data = {
             ...data,
-            amount: data.amount ? Number(data.amount) : null
+            amount: data.amount ? Number(data.amount) : 0
         }
         const save_res = await new con.service(data).save()
         return { status: true, save_res }
