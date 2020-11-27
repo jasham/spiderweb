@@ -68,6 +68,7 @@ const remove_cat_sub_service = async (image_id) => {
 }
 
 const active_cat_sub_service = async (image_id, _id, image,type,activeStatus) => {
+    console.log("I reached e",activeStatus)
     try {
         let qry = {}
         if (image === 'category')
@@ -78,8 +79,12 @@ const active_cat_sub_service = async (image_id, _id, image,type,activeStatus) =>
             qry = { service_id: _id ,type:type}
 
         const updateFalse = await con.image.updateMany(qry, { active: false })
+        console.log("Here is active false image for category",updateFalse)
+
         if (updateFalse.ok) {
             const updateTrue = await con.image.findByIdAndUpdate(image_id, { active: activeStatus, rut: new Date() })
+            console.log("Here is active true image for category",updateTrue)
+
             return { status: true }
         }
         return { status: false, error: 'somthing wrong to update image status false' }

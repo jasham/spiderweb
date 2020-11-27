@@ -140,8 +140,9 @@ const del_category_image = (req, res) => {
 }
 
 const active_image = async (req, res) => {
+    console.log("Get in to image category",req.params)
     try {
-        category.activeImage(req.params.id,req.params.category_id,req.params.image,req.params.type).then(status => {
+        category.activeImage(req.params.id,req.params.category_id,req.params.image,req.params.type, req.params.status).then(status => {
             if (status.status)
                 return res.status(200).send({ result: 'success' })
             else
@@ -162,7 +163,7 @@ router.get('/active/:id/:status', active)
 router.post('/category_image', upload_image)
 router.get('/category_image', list_image)
 router.delete('/category_image/:id', del_category_image)
-router.get('/category_image/active/:id/:category_id/:image/:type', active_image)
+router.get('/category_image/active/:id/:category_id/:image/:type/:status', active_image)
 
 
 module.exports = router
