@@ -128,7 +128,7 @@ const del_service_image = (req, res) => {
 
 const active_image = async (req, res) => {
     try {
-        service.activeImage(req.params.id,req.params.service_id,req.params.image,req.params.type).then(status => {
+        service.activeImage(req.params.id,req.params.service_id,req.params.image,req.params.type, req.params.status).then(status => {
             if (status.status)
                 return res.status(200).send({ result: 'success' })
             else
@@ -149,7 +149,7 @@ router.get('/active/:id/:status', active)
 router.post('/service_image', upload_image)
 router.get('/service_image', list_image)
 router.delete('/service_image/:id',del_service_image)
-router.get('/service_image/active/:id/:service_id/:image/:type', active_image)
+router.get('/service_image/active/:id/:service_id/:image/:type/:status', active_image)
 
 module.exports = router
 

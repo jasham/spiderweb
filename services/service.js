@@ -114,9 +114,9 @@ const deleteImage = async (_id) => {
     }
 }
 
-const activeImage = async (image_id, _id, img,type) => {
+const activeImage = async (image_id, _id, img,type,status) => {
     try {
-        const img_res = await image.active_cat_sub_service(image_id, _id, img,type)
+        const img_res = await image.active_cat_sub_service(image_id, _id, img,type,status)
         return img_res
     } catch (error) {
         return { status: false, error: error.toString() }
