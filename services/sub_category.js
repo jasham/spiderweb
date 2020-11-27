@@ -147,7 +147,6 @@ const listDetailedSubCategory = async () => {
             for (let i = 0; i < sub_cat.length; i++) {
                 let sub_cat_services = await con.service.find({ sub_category_id: sub_cat[i]._id, deleted: false, active: true },{ service : 1, amount : 1, description : 1, sub_category_id : 1})
                 let sub_cat_rel_img = await con.image.find({ sub_category_id: sub_cat[i]._id, deleted: false, active: true })
-                console.log("Here is service list",sub_cat_services)
                 let tempObj = {}
                 if (sub_cat_rel_img.length > 0) {
                     sub_cat_rel_img.map((data) => {
