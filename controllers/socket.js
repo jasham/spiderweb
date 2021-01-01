@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { server } = require('../server')
+const { server } = require('../server2')
 const io = require('socket.io')(server);
 
 global.users = []

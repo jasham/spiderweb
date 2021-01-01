@@ -63,7 +63,6 @@ login = async (data) => {
             }
             else
                 return { status: 'wrongEmail' }
-
         }
         else {
             emailOrMobileExist = await con.credential.exists({ mobile: data.emailOrMobile, deleted: false })
@@ -83,17 +82,16 @@ login = async (data) => {
             else
                 return { status: 'wrongMobile' }
         }
-
     } catch (error) {
         return { status: false, error: error.toString() }
     }
 }
 
-
 loginUserRecord = async (loginObj) => {
     try {
         const getCredential = await con.credential.findOne(loginObj)
         const getUser = await con.user.findOne({ credential_id: getCredential._id })
+        const getServicesList = await con.vendor_group.find({ vendor_id : getUser._id, deleted : false})
         var user = {}
         let tokenObj = {
             _id: getUser._id,
@@ -109,6 +107,7 @@ loginUserRecord = async (loginObj) => {
         user["uid"] = getCredential.uid
         user["role_id"] = getUser.role_id
         user["token"] = token
+        user["services"] = getServicesList
 
         return { status: true, user }
     } catch (error) {

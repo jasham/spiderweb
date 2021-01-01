@@ -1,24 +1,24 @@
 const con = require('../helper/db')
 
-const save = async (data) => {
+const save = async (req) => {
     try {
-        let saved = []
-        let exists = []
-        let count = 0
-        if (data.length > 0) {
-            for (let i = 0; i < data.length; i++) {
-                const exist = await con.category.exists({ category: data[i].category, deleted: false })
-                if (exist) {
-                    exists.push({ category: data[i].category })
-                } else {
-                    const save_res = await new con.category(data[i]).save()
-                    saved.push(save_res)
-                }
-                count++
-            }
+        req.app.io.emit(req.body.group_id,"hello")
+        const service_exists = await con.service.find({ category_id : req.body.category_id, _id : req.body.sub_category_id, _id : req.body.service_id })
+        if(service_exists){
+            console.log("Service exists",service_exists) 
+        }else{
+            // return category not exists failure
         }
-        //if (count === data.length)
-        return { status: true, saved, exists }
+        return true
+        // check address id exist or not
+
+        // check for socket id for user exist or not
+
+        // save the data related to bookings
+
+        // save the data related to booking services
+
+        
     } catch (error) {
         return { status: false, error: error.toString() }
     }

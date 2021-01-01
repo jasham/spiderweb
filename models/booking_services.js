@@ -7,7 +7,9 @@ const bookingService = mongoose.Schema({
     service_time: { type : Date },
     category_id: { type : String },
     sub_category_id: { type : String },
-    booking_id: { type : String }
+    booking_id: { type : String },
+    user_s_id : { type : String },
+    vendor_s_id : { type : String }
 })
 
-module.exports = mongoose.model(bookingService)
+module.exports = mongoose.model('Booking_Services',bookingService)

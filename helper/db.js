@@ -33,4 +33,6 @@ module.exports = {
     group: require('../models/group'),
     image: require('../models/image'),
     vendor_group: require('../models/vendor_group'),
+    booking : require('../models/bookings'),
+    booking_services : require('../models/booking_services')
 }

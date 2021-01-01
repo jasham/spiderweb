@@ -3,7 +3,6 @@ const router = require('express').Router()
 
 const list_all_sub_category = (req, res) => {
     try {
-        
         sub_category.listDetailedSubCategory().then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.sub_cat })
