@@ -1,7 +1,7 @@
 const express  = require('express')
 const cors = require('cors')
-const app = require('express')();
-const http = require('http').createServer(app);
+const app = require('express')()
+const http = require('http').createServer(app)
 
 app.use(cors())
 
@@ -25,5 +25,5 @@ app.use(routes);
 app.io = io
 
 http.listen(port, () => {
-	console.log('listening on *:',port);
-});
+	console.log('listening on *:',port)
+})

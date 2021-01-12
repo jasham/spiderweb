@@ -5,7 +5,6 @@ const { categoryValidationRules } = require('../helper/model_validator/category_
 
 
 const add = (req, res) => {
-    console.log("Category add")
     try {
         category.save(req.body).then(save_res => {
             if (save_res.status)

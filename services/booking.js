@@ -1,29 +1,74 @@
 const con = require('../helper/db')
 
-const save = async (req) => {
+const save = async (data) => {
     try {
-        req.app.io.emit(req.body.group_id,"hello")
-        const service_exists = await con.service.find({ category_id : req.body.category_id, _id : req.body.sub_category_id, _id : req.body.service_id })
-        if(service_exists){
-            console.log("Service exists",service_exists) 
-        }else{
-            // return category not exists failure
+        let bookingObj = {
+            scheduled_date: data.scheduled_date,
+            scheduled_time: data.scheduled_time,
+            description: data.description,
+            status: 'New',
+            address_id: data.address_id
         }
-        return true
-        // check address id exist or not
+        const saveBookingRes = await con.booking(bookingObj).save()
+        if (saveBookingRes) {
+            let serviceIds = data.serviceIds
+            let serviceNames = []
+            serviceIds.forEach(async (el) => {
+                let bSeviceObj = {
+                    user_id: data.user_id,
+                    service_id: el.service_id,
+                    sub_category_id: data.sub_category_id,
+                    booking_id: saveBookingRes._id
+                }
+                await con.booking_service(bSeviceObj).save()
+                const bookService = await con.address.findOne({ _id: data.el.service_id }, { service: 1 })
+                serviceNames.push({ service: bookService.service })
+            })
+            const userAddress = await con.address.findOne({ _id: data.address_id, user_id: data.user_id }, { latitude: 1, longitude: l })
+            const bookSubCategory = await con.address.findOne({ _id: data.sub_category_id }, { sub_category: 1 })
+            // have to add data in vendor notification table
 
-        // check for socket id for user exist or not
+            const notificationDetails = {// this details go to vendor by io socket , can add more fields as per requirement
+                latitude: userAddress.latitude,
+                longitude: userAddress.longitude,
+                sub_category: bookSubCategory.sub_category,
+                services: serviceNames,
+                scheduled_date: data.scheduled_date,
+                scheduled_time: data.scheduled_time,
+                description: data.description,
+                booking_id: saveBookingRes._id
+            }
+            return { status: true, notificationDetails }
+        }
+        return { status: false, error: 'something wrong to save data in booking' }
 
-        // save the data related to bookings
-
-        // save the data related to booking services
-
-        
     } catch (error) {
         return { status: false, error: error.toString() }
     }
 }
 
+//#region ---VENDOR SIDE EVENT---
+
+const accept = async (vendor_id, booking_id) => {
+    try {
+        updObj = {
+            status: 'Accepted By Vendor',
+            vendor_id: vendor_id
+        }
+        const acceprRes = await con.booking.updateOne({ _id: booking_id }, updObj)
+        if (acceprRes.ok){
+            
+        }
+                
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
+//#endregion
+
+
 module.exports = {
-    save
+    save,
+    accept
 }

@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
@@ -33,6 +32,7 @@ module.exports = {
     group: require('../models/group'),
     image: require('../models/image'),
     vendor_group: require('../models/vendor_group'),
-    booking : require('../models/bookings'),
-    booking_services : require('../models/booking_services')
+    booking : require('../models/booking'),
+    booking_service : require('../models/booking_service'),
+    address : require('../models/address')
 }
