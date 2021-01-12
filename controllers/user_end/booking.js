@@ -3,7 +3,7 @@ const router = require('express').Router()
 
 const add = (req, res) => {
     try {
-        booking.save(req).then(status => {
+        booking.save(req.body).then(status => {
             if (status.status)
                 return res.status(200).send({ result: 'success' })
             else
