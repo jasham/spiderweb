@@ -4,6 +4,7 @@ const config = require('../helper/config')
 
 checkAuthentication = (req, res, next) => {
   const authHeader = req.headers.authorization
+  console.log("Here is autherization",req.headers)
   if (authHeader) {
     const token = authHeader.split(' ')[1]// Bearer <token>
     jwt.verify(token, config.config.secret, async function (err, decoded) {
