@@ -107,8 +107,18 @@ const active = async (id, active_status) => {
             status = false
 
         const update_active_status = await con.category.updateOne({ _id: id }, { active: status })
-        if (update_active_status.ok)
-            return { status: true }
+        if (update_active_status) {
+            const update_sub_cat_status = await con.sub_category.updateMany({ category_id : id }, { active: status })
+            if(update_sub_cat_status){
+                const update_grp_active = await con.group.updateOne({ _id: update_active_status.group_id }, { active: status })
+                if (update_grp_active){
+                    const venDorGroup = await con.vendor_group.updateOne({ group_id : update_active_status.group_id }, { active : status })
+                    if(venDorGroup.ok)
+                    return { status: true }
+                }
+            }
+        }
+        
 
     } catch (error) {
         return { status: false, error: error.toString() }
