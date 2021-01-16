@@ -36,7 +36,7 @@ const save = async (data) => {
                 scheduled_date: data.scheduled_date,
                 scheduled_time: data.scheduled_time,
                 description: data.description,
-                booking_id: saveBookingRes._id
+                booking_id: saveBookingRes._id      
             }
             return { status: true, notificationDetails }
         }
