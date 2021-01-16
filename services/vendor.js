@@ -75,7 +75,9 @@ const active = async (id, active_status) => {
 
 const list_sub_cat_grp = async () => {
     try {
-        const sub_cat_ven = await con.group.find({ active: true, deleted: false }, { group_name: 1 }).sort({ _id: -1 })
+        const sub_cat_ven = await con.group.find({ active: true, deleted: false }, { group_name: 1 }).sort({ _id: -1 }).then((data) => {
+            console.log("Tilka nija",data)
+        })
         return { status: true, vendor_sub_category: sub_cat_ven }
 
     } catch (error) {

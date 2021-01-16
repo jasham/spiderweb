@@ -1,4 +1,4 @@
-const router = require('express'). Router()
+const router = require('express').Router()
 const bookingService = require('../services/booking')
 
 //#region ---USER SIDE EVENT---
@@ -45,6 +45,6 @@ const accept = (req, res) => {
 //#endregion
 
 router.post('/', add)
-router.post('/', accept)
+router.post('/accept', accept)
 
 module.exports = router
