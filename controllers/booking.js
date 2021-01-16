@@ -1,4 +1,4 @@
-const router = require('express'). Router()
+const router = require('express').Router()
 const bookingService = require('../services/booking')
 
 //#region ---USER SIDE EVENT---
@@ -8,7 +8,9 @@ const add = (req, res) => {
         bookingService.save(req.body).then(bookingRes => {
             if(bookingRes.status){
                 result='success'
-                req.app.io.emit(req.body.group_id, bookingRes.notificationDetails)
+                console.log("Here is group id",req.body.group_id)
+                console.log("Here is data",bookingRes.notificationDetails)
+                req.app.io .emit(req.body.group_id, bookingRes.notificationDetails)
                 return res.status(200).send({ result })
             }
             else{
@@ -45,6 +47,6 @@ const accept = (req, res) => {
 //#endregion
 
 router.post('/', add)
-router.post('/', accept)
+router.post('/accept', accept)
 
 module.exports = router

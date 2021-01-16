@@ -91,12 +91,15 @@ const active = async (id, active_status) => {
             status = true
         else
             status = false
-
         const update_active_status = await con.sub_category.findOneAndUpdate({ _id: id }, { active: status }, { new: true })
         if (update_active_status) {
             const update_grp_active = await con.group.updateOne({ _id: update_active_status.group_id }, { active: status })
-            if (update_grp_active.ok)
-                return { status: true }
+            if (update_grp_active.ok){
+                const venDorGroup = await con.vendor_group.updateOne({ group_id : update_active_status.group_id }, { active : status })
+                if(venDorGroup.ok)
+                    return { status: true }
+            }
+                
         }
 
     } catch (error) {
@@ -140,6 +143,7 @@ const activeImage = async (image_id, _id, img, type, status) => {
     }
 }
 
+
 const listDetailedSubCategory = async () => {
     try {
         let sub_cat = await con.sub_category.find({ active: true, deleted: false })
@@ -166,6 +170,7 @@ const listDetailedSubCategory = async () => {
                 sub_cat[i] = { ...tempObj, service : [...sub_cat_services], ...sub_cat[i].toObject() }
             }
         }
+        console.log("Here is sub cat",sub_cat)
         return { status: true, sub_cat }
     } catch (error) {
         return { status: false, error: error.toString() }

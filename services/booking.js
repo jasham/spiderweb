@@ -1,6 +1,7 @@
 const con = require('../helper/db')
 
 const save = async (data) => {
+    console.log("Here is end data",data)
     try {
         let bookingObj = {
             scheduled_date: data.scheduled_date,
@@ -21,11 +22,11 @@ const save = async (data) => {
                     booking_id: saveBookingRes._id
                 }
                 await con.booking_service(bSeviceObj).save()
-                const bookService = await con.address.findOne({ _id: data.el.service_id }, { service: 1 })
+                const bookService = await con.service.findOne({ _id: el.service_id }, { service: 1 })
                 serviceNames.push({ service: bookService.service })
             })
-            const userAddress = await con.address.findOne({ _id: data.address_id, user_id: data.user_id }, { latitude: 1, longitude: l })
-            const bookSubCategory = await con.address.findOne({ _id: data.sub_category_id }, { sub_category: 1 })
+            const userAddress = await con.address.findOne({ _id: data.address_id, user_id: data.user_id }, { latitude: 1, longitude: 1 })
+            const bookSubCategory = await con.sub_category.findOne({ _id: data.sub_category_id }, { sub_category: 1 })
             // have to add data in vendor notification table
 
             const notificationDetails = {// this details go to vendor by io socket , can add more fields as per requirement

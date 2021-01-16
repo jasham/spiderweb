@@ -2,7 +2,6 @@ const con = require('../helper/db')
 
 const save = async (data) => {
     try {
-
         const saveRes = await con.address(data).save()
         if (saveRes)
             return { status: true, saveRes }

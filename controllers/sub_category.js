@@ -64,6 +64,7 @@ const update_specific_sub_category = (req, res) => {
 }
 
 const active = async (req, res) => {
+    console.log("reached",req.body)
     try {
         sub_category.active(req.params.id, req.params.status).then(update_status => {
             if (update_status.status)
