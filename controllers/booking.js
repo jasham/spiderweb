@@ -8,7 +8,7 @@ const add = (req, res) => {
         bookingService.save(req.body).then(bookingRes => {
             if (bookingRes.status) {
                 result = 'success'
-                req.app.io.emit(bookingRes.notificationDetails)
+                req.app.io.emit("booking",bookingRes.notificationDetails)
                 return res.status(200).send({ result })
             }
             else {
