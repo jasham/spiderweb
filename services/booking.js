@@ -1,14 +1,15 @@
 const con = require('../helper/db')
 
+//#region ---USER SIDE EVENTs---
 const save = async (data) => {
-    console.log("Here is end data",data)
     try {
         let bookingObj = {
             scheduled_date: data.scheduled_date,
             scheduled_time: data.scheduled_time,
             description: data.description,
             status: 'New',
-            address_id: data.address_id
+            address_id: data.address_id,
+            user_id: data.user_id
         }
         const saveBookingRes = await con.booking(bookingObj).save()
         if (saveBookingRes) {
@@ -16,7 +17,6 @@ const save = async (data) => {
             let serviceNames = []
             serviceIds.forEach(async (el) => {
                 let bSeviceObj = {
-                    user_id: data.user_id,
                     service_id: el.service_id,
                     sub_category_id: data.sub_category_id,
                     booking_id: saveBookingRes._id
@@ -37,7 +37,7 @@ const save = async (data) => {
                 scheduled_date: data.scheduled_date,
                 scheduled_time: data.scheduled_time,
                 description: data.description,
-                booking_id: saveBookingRes._id      
+                booking_id: saveBookingRes._id
             }
             return { status: true, notificationDetails }
         }
@@ -48,28 +48,80 @@ const save = async (data) => {
     }
 }
 
-//#region ---VENDOR SIDE EVENT---
+const acceptByUser = async (user_id, booking_id) => {
+    try {
+        updObj = {
+            status: 'Accepted By User'
+        }
+        const acceptRes = await con.booking.updateOne({ _id: booking_id, user_id: user_id }, updObj)
+        if (acceptRes.ok) {
+            const user = await con.user.findById(user_id)
+            const userCredential = await con.credential.findById(user.credential_id)
+            const booking = await con.booking.findById(booking_id)
+            const address = await con.address.findById(booking.address_id)
+            const bookedServices = await con.booking_service.find({ booking_id: booking_id }, { sub_category_id: 1, service_id: 1 })
+            const subCategory = await con.sub_category.findById(bookedServices[0].sub_category_id)
+            const detailsAfterAcceptByUser = {
+                name: user.name,
+                mobile: userCredential.mobile,
+                image_url: user.image_url,
+                vendor_id: booking.vendor_id,
+                sub_category: subCategory.sub_category,
+                scheduled_date: booking.scheduled_date,
+                scheduled_time: booking.scheduled_time,
+                address
+            }
+            return { status: true, detailsAfterAcceptByUser }
+        }
 
-const accept = async (vendor_id, booking_id) => {
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+//#endregion
+
+//#region ---VENDOR SIDE EVENTs---
+const acceptByVendor = async (vendor_id, booking_id) => {
     try {
         updObj = {
             status: 'Accepted By Vendor',
             vendor_id: vendor_id
         }
-        const acceprRes = await con.booking.updateOne({ _id: booking_id }, updObj)
-        if (acceprRes.ok){
-            
+        const exist = await con.booking.exists({ _id: booking_id, status: 'Accepted By Vendor' })
+        if (exist)
+            return { status: 'alreadyAccepted' }
+        else {
+            const acceptRes = await con.booking.updateOne({ _id: booking_id }, updObj)
+            if (acceptRes.ok) {
+                const vendor = await con.vendor.findById(vendor_id)
+                const user = await con.user.findById(vendor.user_id)
+                const userCredential = await con.credential.findById(user.credential_id)
+                const booking = await con.booking.findById(booking_id)
+                const bookedServices = await con.booking_service.find({ booking_id: booking_id }, { sub_category_id: 1, service_id: 1 })
+                const subCategory = await con.sub_category.findById(bookedServices[0].sub_category_id)
+                const detailsAfterAcceptByVendor = {
+                    name: vendor.name,
+                    mobile: userCredential.mobile,
+                    image_url: user.image_url,
+                    vendor_id,
+                    sub_category: subCategory.sub_category,
+                    scheduled_date: booking.scheduled_date,
+                    scheduled_time: booking.scheduled_time,
+                    user_id: booking.user_id
+                }
+                return { status: true, detailsAfterAcceptByVendor }
+            }
         }
-                
+
     } catch (error) {
         return { status: false, error: error.toString() }
     }
 }
-
 //#endregion
 
 
 module.exports = {
     save,
-    accept
+    acceptByVendor,
+    acceptByUser
 }

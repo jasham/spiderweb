@@ -91,17 +91,14 @@ const active = async (id, active_status) => {
             status = true
         else
             status = false
+
         const update_active_status = await con.sub_category.findOneAndUpdate({ _id: id }, { active: status }, { new: true })
         if (update_active_status) {
+            await con.service.updateOne({ sub_category_id: id }, { active: status })
             const update_grp_active = await con.group.updateOne({ _id: update_active_status.group_id }, { active: status })
-            if (update_grp_active.ok){
-                const venDorGroup = await con.vendor_group.updateOne({ group_id : update_active_status.group_id }, { active : status })
-                if(venDorGroup.ok)
-                    return { status: true }
-            }
-                
+            const update_ven_grp = await con.vendor_group.updateOne({ group_id: update_active_status.group_id }, { active: status })
+            return { status: true }
         }
-
     } catch (error) {
         return { status: false, error: error.toString() }
     }
@@ -143,13 +140,12 @@ const activeImage = async (image_id, _id, img, type, status) => {
     }
 }
 
-
 const listDetailedSubCategory = async () => {
     try {
         let sub_cat = await con.sub_category.find({ active: true, deleted: false })
         if (sub_cat.length > 0) {
             for (let i = 0; i < sub_cat.length; i++) {
-                let sub_cat_services = await con.service.find({ sub_category_id: sub_cat[i]._id, deleted: false, active: true },{ service : 1, amount : 1, description : 1, sub_category_id : 1})
+                let sub_cat_services = await con.service.find({ sub_category_id: sub_cat[i]._id, deleted: false, active: true }, { service: 1, amount: 1, description: 1, sub_category_id: 1 })
                 let sub_cat_rel_img = await con.image.find({ sub_category_id: sub_cat[i]._id, deleted: false, active: true })
                 let tempObj = {}
                 if (sub_cat_rel_img.length > 0) {
@@ -167,10 +163,9 @@ const listDetailedSubCategory = async () => {
                 if (!tempObj.banner_url) {
                     tempObj = { banner_url: null, ...tempObj }
                 }
-                sub_cat[i] = { ...tempObj, service : [...sub_cat_services], ...sub_cat[i].toObject() }
+                sub_cat[i] = { ...tempObj, service: [...sub_cat_services], ...sub_cat[i].toObject() }
             }
         }
-        console.log("Here is sub cat",sub_cat)
         return { status: true, sub_cat }
     } catch (error) {
         return { status: false, error: error.toString() }

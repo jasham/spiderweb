@@ -90,7 +90,6 @@ const active = async (req, res) => {
     }
 }
 
-
 const upload_image = (req, res) => {
     try {
         req.body.hostUrl = req.protocol + '://' + req.get('host')
@@ -139,7 +138,6 @@ const del_category_image = (req, res) => {
 }
 
 const active_image = async (req, res) => {
-    console.log("Get in to image category",req.params)
     try {
         category.activeImage(req.params.id,req.params.category_id,req.params.image,req.params.type, req.params.status).then(status => {
             if (status.status)

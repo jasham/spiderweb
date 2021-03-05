@@ -1,5 +1,6 @@
 const con = require('../helper/db')
 const image = require('../services/image')
+var ObjectId = require('mongodb').ObjectId
 
 const save = async (data) => {
     try {
@@ -108,18 +109,19 @@ const active = async (id, active_status) => {
 
         const update_active_status = await con.category.updateOne({ _id: id }, { active: status })
         if (update_active_status) {
-            const update_sub_cat_status = await con.sub_category.updateMany({ category_id : id }, { active: status })
-            if(update_sub_cat_status){
-                const update_grp_active = await con.group.updateOne({ _id: update_active_status.group_id }, { active: status })
-                if (update_grp_active){
-                    const venDorGroup = await con.vendor_group.updateOne({ group_id : update_active_status.group_id }, { active : status })
-                    if(venDorGroup.ok)
-                    return { status: true }
+            const update_sub_cat_status = await con.sub_category.updateMany({ category_id: id }, { active: status })
+            await con.service.updateOne({ category_id: id }, { active: status })
+            if (update_sub_cat_status.ok) {
+                const updated_sub_cat = await con.sub_category.find({ category_id: id, active: status, deleted: false }, { _id: 1, group_id: 1 })
+                if (updated_sub_cat.length > 0) {
+                    updated_sub_cat.forEach(async el => {                        
+                        await con.group.updateOne({ _id: el.group_id }, { active: status })
+                        await con.vendor_group.updateOne({ group_id: el.group_id }, { active: status })
+                    }) 
+                    return { status: true }                
                 }
             }
         }
-        
-
     } catch (error) {
         return { status: false, error: error.toString() }
     }
@@ -152,9 +154,9 @@ const deleteImage = async (_id) => {
     }
 }
 
-const activeImage = async (image_id, _id, img,type,status) => {
+const activeImage = async (image_id, _id, img, type, status) => {
     try {
-        const img_res = await image.active_cat_sub_service(image_id, _id, img,type,status)
+        const img_res = await image.active_cat_sub_service(image_id, _id, img, type, status)
         return img_res
     } catch (error) {
         return { status: false, error: error.toString() }

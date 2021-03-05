@@ -25,6 +25,7 @@ module.exports = {
     main,
     credential: require('../models/credential'),
     user: require('../models/user'),
+    vendor: require('../models/vendor'),
     service: require('../models/service'),
     image: require('../models/image'),
     category: require('../models/category'),
