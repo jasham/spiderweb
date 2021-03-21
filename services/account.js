@@ -21,7 +21,19 @@ signup = async (data) => {
         const saveCredential = await con.credential(data).save()
         data.credential_id = saveCredential._id
         const saveUser = await new con.user(data).save()
+    
         if (saveUser !== undefined) {
+            if (data.role_id === 2) {// only for vendor
+                let vObj = {
+                    status: 'Available',
+                    user_id: saveUser._id
+                }
+               const saveVendor= await new con.vendor(vObj).save()
+                user["vendor_status"] = saveVendor.status
+                user["vendor_isActive"] = saveVendor.active
+                user["vendor_id"] = saveVendor._id
+            }
+
             let tokenObj = {
                 _id: saveUser._id,
                 uid: saveCredential.uid
@@ -32,10 +44,11 @@ signup = async (data) => {
             user["email"] = saveCredential.email
             user["mobile"] = saveCredential.mobile
             user["name"] = saveUser.name
-            user["user_status"] = saveCredential.active
+            user["image_url"] = saveUser.image_url
+            user["credential_isActive"] = saveCredential.active
             user["role_id"] = saveUser.role_id
             user["uid"] = saveCredential.uid
-            user["token"] = token
+            user["token"] = token           
         }
         return { status: true, user }
     } catch (error) {
@@ -91,7 +104,7 @@ loginUserRecord = async (loginObj) => {
     try {
         const getCredential = await con.credential.findOne(loginObj)
         const getUser = await con.user.findOne({ credential_id: getCredential._id })
-        const getServicesList = await con.vendor_group.find({ vendor_id : getUser._id, deleted : false})
+        const getServicesList = await con.vendor_group.find({ vendor_id: getUser._id, deleted: false })
         var user = {}
         let tokenObj = {
             _id: getUser._id,

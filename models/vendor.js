@@ -2,9 +2,8 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const Vendor = mongoose.Schema({
-    name : {type : String},
     status : {type : String},
-    active : {type : Boolean},
+    active : {type : Boolean,default:true},
     user_id : {type:Schema.Types.ObjectId}
 })
 

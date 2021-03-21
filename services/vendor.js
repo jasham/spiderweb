@@ -19,7 +19,6 @@ const list = async (queryParams) => {
         let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
         let qry = { deleted: false, vendor_id: queryParams.vendor_id }
         const ved_grp = await con.vendor_group.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
-        console.log("Here is vendor group",ved_grp)
         const totalRecords = await con.vendor_group.countDocuments(qry)
 
         return { status: true, record: { vendor_group: ved_grp, totalRecords, currentPage: queryParams.currentPage } }
@@ -75,9 +74,7 @@ const active = async (id, active_status) => {
 
 const list_sub_cat_grp = async () => {
     try {
-        const sub_cat_ven = await con.group.find({ active: true, deleted: false }, { group_name: 1 }).sort({ _id: -1 }).then((data) => {
-            console.log("Tilka nija",data)
-        })
+        const sub_cat_ven = await con.group.find({ active: true, deleted: false }, { group_name: 1 }).sort({ _id: -1 })
         return { status: true, vendor_sub_category: sub_cat_ven }
 
     } catch (error) {

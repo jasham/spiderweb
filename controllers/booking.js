@@ -8,7 +8,7 @@ const add = (req, res) => {
         bookingService.save(req.body).then(bookingRes => {
             if (bookingRes.status) {
                 result = 'success'
-                req.app.io.emit("booking",bookingRes.notificationDetails)
+                req.app.io.emit("booking", bookingRes.notificationDetails)
                 return res.status(200).send({ result })
             }
             else {
@@ -19,11 +19,10 @@ const add = (req, res) => {
         res.send({ result, error: err.toString(), data: null })
     }
 }
-
 const acceptByUser = (req, res) => {
     var result = 'fail'
     try {
-        bookingService.acceptByUser(req.params.user_id,req.params.vendor_id, req.params.booking_id,).then(acceptRes => {
+        bookingService.acceptByUser(req.params.user_id, req.params.booking_id,).then(acceptRes => {
             if (acceptRes.status) {
                 result = 'success'
                 req.app.io.emit('acceptByUser', acceptRes.detailsAfterAcceptByUser)
@@ -37,7 +36,41 @@ const acceptByUser = (req, res) => {
         res.send({ result, error: err.toString(), data: null })
     }
 }
-
+const rejectByUser = (req, res) => {
+    var result = 'fail'
+    try {
+        bookingService.rejectByUser(req.params.user_id, req.params.rejected_vendor_id, req.params.booking_id).then(rejectRes => {
+            if (rejectRes.status) {
+                result = 'success'
+                req.app.io.emit('rejectByUser', rejectRes.detailsAfterRejectByUser)
+                return res.status(200).send({ result })
+            }
+            else {
+                res.send({ result, error: rejectRes.error, data: null })
+            }
+        })
+    } catch (err) {
+        res.send({ result, error: err.toString(), data: null })
+    }
+}
+const cancelByUser = (req, res) => {
+    var result = 'fail'
+    try {
+        bookingService.cancelByUser(req.params.user_id, req.params.booking_id,).then(cancelRes => {
+            if (cancelRes.status) {
+                result = 'success'
+                if (cancelRes.detailsAfterCancelByUser.vendor_id !== null)
+                    req.app.io.emit('cancelByUser', cancelRes.detailsAfterCancelByUser)
+                return res.status(200).send({ result })
+            }
+            else {
+                res.send({ result, error: cancelRes.error, data: null })
+            }
+        })
+    } catch (err) {
+        res.send({ result, error: err.toString(), data: null })
+    }
+}
 //#endregion
 
 //#region ---VENDOR SIDE EVENT---
@@ -66,8 +99,17 @@ const acceptByVendor = (req, res) => {
 
 //#endregion
 
+//#region ---USER Routing---
 router.post('/', add)
-router.get('/acceptbyvendor', acceptByVendor)
-router.get('/acceptbyuser', acceptByUser)
+router.get('/acceptbyuser/:user_id/:booking_id', acceptByUser)
+router.get('/rejectbyuser/:user_id/:rejected_vendor_id/:booking_id', rejectByUser)
+router.get('/cancelbyuser/:vendor_id/:booking_id', cancelByUser)
+
+//#endregion
+
+//#region ---VENDOR Routing---
+router.get('/acceptbyvendor/:vendor_id/:booking_id', acceptByVendor)
+
+//#endregion
 
 module.exports = router
