@@ -9,6 +9,6 @@ const Credential = new mongoose.Schema({
     deleted: { type: Boolean, default: false },
     rct: { type: Date, default: new Date() },
     rut: { type: Date, default: null }
-})
+},{timestamps:true})
 
 module.exports = mongoose.model('Credential', Credential, 'Credential')
