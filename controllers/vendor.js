@@ -93,6 +93,21 @@ const list_all_grp = async (req, res) => {
 }
 
 
+const active_vendor = async (req, res) => {
+    try {
+        vendor.active_vendor(req.params.id, req.params.status).then(update_status => {
+            if (update_status.status)
+                return res.status(200).send({ result: 'success' })
+            else
+                return res.status(200).send({ result: 'fail', error: update_status.error })
+        })
+    }
+    catch (error) {
+        return res.send({ result: 'fail', error: error.toString() })
+    }
+}
+
+
 
 router.post('/', add)
 router.get('/', list_all_sub_cat_grp)
@@ -100,6 +115,7 @@ router.put('/', update_specific_sub_cat_grp)
 router.delete('/:id', del_specific_sub_cat_grp)
 router.get('/active/:id/:status', active)
 router.get('/service_group', list_all_grp)
+router.patch('/change/status/:id/:status', active_vendor)
 
 
 module.exports = router

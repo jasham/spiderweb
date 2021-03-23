@@ -82,6 +82,30 @@ const list_sub_cat_grp = async () => {
     }
 }
 
+const active_vendor = async (id, active_status) => {
+    try {
+        let update = {}
+        if (active_status === 'true'){
+            update = {
+                active : true,
+                status : 'Available'
+            }
+        }else {
+            update = {
+                active : false,
+                status : 'Unavailable'
+            }
+        }
+
+        const update_active_status = await con.vendor.updateOne({ _id: id }, update)
+        if (update_active_status.ok)
+            return { status: true }
+
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
 
 module.exports = {
     save,
@@ -89,5 +113,6 @@ module.exports = {
     remove,
     update,
     active,
+    active_vendor,
     list_sub_cat_grp
 }
