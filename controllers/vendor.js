@@ -111,7 +111,7 @@ const generate_otp = async (req, res) => {
     try {
         vendor.generate_otp(req.body).then(response => {
             if (response.status)
-                return res.status(200).send({ result: 'success' })
+                return res.status(200).send({ result: response.message })
             else
                 return res.status(200).send({ result: 'fail', error: response.error })
         })

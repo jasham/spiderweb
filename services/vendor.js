@@ -111,16 +111,16 @@ const generate_otp = async (data) => {
             otp : otp,
             credential_id : data.id
         }
-        const generate_otp = await con.otpLog(log).save()
+        const generate_otp = await new con.otpLog(log).save()
         if(generate_otp){
-
+            let message = `Thanks for choosing spider-way! Here is your 6-digits OTP to verify your mobile number. OTP : ${otp}`
             /**
              *  CODE FOR SENDING OTP TO MOBILE
              * @params mobile
              * @params otp
              */
 
-            return { status: true }
+            return { status: true, message}
         }
 
     } catch (error) {
@@ -143,7 +143,7 @@ const verify_otp_update_mobile = async (data) => {
             const update_mobile = await new con.credential.updateOne({ _id: id }, update)
             if (update_mobile.ok)
                 return { status: true }
-        } else return { status : false}
+        } else return { status : false, error: 'Otp is incorrect / already used'}
         
 
     } catch (error) {
