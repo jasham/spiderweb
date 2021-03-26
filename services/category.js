@@ -77,8 +77,7 @@ const update = async (data) => {
         if (data.length > 0) {
             for (let i = 0; i < data.length; i++) {
                 let updateObj = {
-                    category: data[i].category,
-                    rut: Date.now()
+                    category: data[i].category
                 }
                 const exist = await con.category.exists({ category: data[i].category, deleted: false, _id: { $nin: data[i]._id } })
                 if (exist) {

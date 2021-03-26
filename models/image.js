@@ -10,9 +10,7 @@ const Image = new mongoose.Schema({
     category_id : {type:Schema.Types.ObjectId},
     sub_category_id : {type:Schema.Types.ObjectId, default:null},
     active: { type: Boolean, default: false },
-    deleted: { type: Boolean, default: false },
-    rct: { type: Date, default: new Date() },
-    rut: { type: Date, default:null }
-})
+    deleted: { type: Boolean, default: false }
+},{timestamps:true})
 
 module.exports = mongoose.model('Image',Image,'Image')

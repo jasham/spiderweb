@@ -35,5 +35,6 @@ module.exports = {
     vendor_group: require('../models/vendor_group'),
     booking : require('../models/booking'),
     booking_service : require('../models/booking_service'),
-    address : require('../models/address')
+    address : require('../models/address'),
+    otpLog : require('../models/otp_log')
 }

@@ -79,7 +79,7 @@ const active_cat_sub_service = async (image_id, _id, image,type,activeStatus) =>
 
         const updateFalse = await con.image.updateMany(qry, { active: false })
         if (updateFalse.ok) {
-            const updateTrue = await con.image.findByIdAndUpdate(image_id, { active: activeStatus, rut: new Date() })
+            const updateTrue = await con.image.findByIdAndUpdate(image_id, { active: activeStatus})
             return { status: true }
         }
         return { status: false, error: 'somthing wrong to update image status false' }

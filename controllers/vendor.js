@@ -1,3 +1,4 @@
+const { response } = require('express')
 const vendor = require('../services/vendor')
 const router = require('express').Router()
 
@@ -92,7 +93,6 @@ const list_all_grp = async (req, res) => {
     }
 }
 
-
 const active_vendor = async (req, res) => {
     try {
         vendor.active_vendor(req.params.id, req.params.status).then(update_status => {
@@ -100,6 +100,34 @@ const active_vendor = async (req, res) => {
                 return res.status(200).send({ result: 'success' })
             else
                 return res.status(200).send({ result: 'fail', error: update_status.error })
+        })
+    }
+    catch (error) {
+        return res.send({ result: 'fail', error: error.toString() })
+    }
+}
+
+const generate_otp = async (req, res) => {
+    try {
+        vendor.generate_otp(req.body).then(response => {
+            if (response.status)
+                return res.status(200).send({ result: 'success' })
+            else
+                return res.status(200).send({ result: 'fail', error: response.error })
+        })
+    }
+    catch (error) {
+        return res.send({ result: 'fail', error: error.toString() })
+    }
+}
+
+const verify_otp_update_mobile = async (req, res) => {
+    try {
+        vendor.update_mobile(req.body).then(response => {
+            if (response.status)
+                return res.status(200).send({ result: 'success' })
+            else
+                return res.status(200).send({ result: 'fail', error: response.error })
         })
     }
     catch (error) {
@@ -115,7 +143,10 @@ router.put('/', update_specific_sub_cat_grp)
 router.delete('/:id', del_specific_sub_cat_grp)
 router.get('/active/:id/:status', active)
 router.get('/service_group', list_all_grp)
-router.patch('/change/status/:id/:status', active_vendor)
+router.patch('/change_status/:id/:status', active_vendor)
+router.post('/send_otp', generate_otp)
+router.patch('/update_mobile', verify_otp_update_mobile)
+
 
 
 module.exports = router

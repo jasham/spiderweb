@@ -6,9 +6,7 @@ const Credential = new mongoose.Schema({
     mobile : {type : String, default: null},
     uid: { type: String },
     active: { type: Boolean, default: true },
-    deleted: { type: Boolean, default: false },
-    rct: { type: Date, default: new Date() },
-    rut: { type: Date, default: null }
+    deleted: { type: Boolean, default: false }
 },{timestamps:true})
 
 module.exports = mongoose.model('Credential', Credential, 'Credential')

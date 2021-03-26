@@ -58,8 +58,7 @@ const update = async (data) => {
         const updateObj = {
             service: data.service,
             amount: data.amount ? Number(data.amount) : 0,
-            description: data.description,
-            rut: Date.now()
+            description: data.description
         }
         const update_category = await con.service.updateOne({ _id: data._id }, updateObj)
         if (update_category.ok)

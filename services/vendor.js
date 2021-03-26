@@ -44,8 +44,6 @@ const update = async (data) => {
         const exist = await con.vendor_group.exists({ vendor_id: data.vendor_id, group_id: data.group_id, deleted: false, _id: { $nin: data._id } })
         if (exist)
             return { status: 'exist' }
-
-        data.rut = Date.now()
         const update_ved_grp = await con.vendor_group.updateOne({ _id: data._id }, data)
         if (update_ved_grp.ok)
             return { status: true }
@@ -106,6 +104,54 @@ const active_vendor = async (id, active_status) => {
     }
 }
 
+const generate_otp = async (data) => {
+    try {
+        let otp = 123456
+        const log = {
+            otp : otp,
+            credential_id : data.id
+        }
+        const generate_otp = await con.otpLog(log).save()
+        if(generate_otp){
+
+            /**
+             *  CODE FOR SENDING OTP TO MOBILE
+             * @params mobile
+             * @params otp
+             */
+
+            return { status: true }
+        }
+
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
+const verify_otp_update_mobile = async (data) => {
+    try {
+        const verify = {
+            otp : data.otp,
+            used : false,
+            credential_id : data.id
+        }
+        const verify_otp = await con.otpLog.findOne(verify)
+        if(verify_otp){
+            const update = {
+                mobile: data.mobile
+            }
+            const update_mobile = await new con.credential.updateOne({ _id: id }, update)
+            if (update_mobile.ok)
+                return { status: true }
+        } else return { status : false}
+        
+
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
+
 
 module.exports = {
     save,
@@ -114,5 +160,7 @@ module.exports = {
     update,
     active,
     active_vendor,
-    list_sub_cat_grp
+    list_sub_cat_grp,
+    generate_otp,
+    verify_otp_update_mobile
 }

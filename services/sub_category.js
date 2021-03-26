@@ -65,8 +65,7 @@ const update = async (data) => {
         const updateObj = {
             sub_category: data.sub_category,
             category_id: data.category_id,
-            amount: data.amount ? Number(data.amount) : 0,
-            rut: Date.now()
+            amount: data.amount ? Number(data.amount) : 0
         }
         const update_sub_category = await con.sub_category.updateOne({ _id: data._id }, updateObj)
         if (update_sub_category.ok) {

@@ -10,9 +10,7 @@ const Address = new mongoose.Schema({
     state : {type : String},
     country : {type : String},
     latitude : {type : String},
-    longitude : {type : String},
-    rct: { type: Date, default: new Date() },
-    rut: { type: Date, default:null }
-})
+    longitude : {type : String}
+},{timestamps:true})
 
 module.exports = mongoose.model('Addresses',Address,'Address')
