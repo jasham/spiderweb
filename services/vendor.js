@@ -82,7 +82,7 @@ const list_sub_cat_grp = async () => {
 
 const active_vendor = async (id, active_status) => {
     try {
-        let update = {}
+        let updateObj = {}
         if (active_status === 'true'){
             update = {
                 active : true,
@@ -95,9 +95,9 @@ const active_vendor = async (id, active_status) => {
             }
         }
 
-        const update_active_status = await con.vendor.updateOne({ _id: id }, update)
+        const update_active_status = await con.vendor.updateOne({ _id: id }, updateObj)
         if (update_active_status.ok)
-            return { status: true }
+            return { status: true,updateObj }
 
     } catch (error) {
         return { status: false, error: error.toString() }

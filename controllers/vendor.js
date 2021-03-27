@@ -24,7 +24,7 @@ const list_all_sub_cat_grp = (req, res) => {
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
         queryParams = JSON.parse(jsonStr)
-        console.log("Here is query params",queryParams)
+        console.log("Here is query params", queryParams)
         vendor.list(queryParams).then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.record })
@@ -97,7 +97,7 @@ const active_vendor = async (req, res) => {
     try {
         vendor.active_vendor(req.params.id, req.params.status).then(update_status => {
             if (update_status.status)
-                return res.status(200).send({ result: 'success' })
+                return res.status(200).send({ result: 'success', status_object: update_status.updateObj })
             else
                 return res.status(200).send({ result: 'fail', error: update_status.error })
         })
@@ -143,7 +143,7 @@ router.put('/', update_specific_sub_cat_grp)
 router.delete('/:id', del_specific_sub_cat_grp)
 router.get('/active/:id/:status', active)
 router.get('/service_group', list_all_grp)
-router.patch('/change_status/:id/:status', active_vendor)
+router.patch('/vendor_status/:id/:status', active_vendor)
 router.post('/send_otp', generate_otp)
 router.patch('/update_mobile', verify_otp_update_mobile)
 
