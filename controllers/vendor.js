@@ -123,7 +123,7 @@ const generate_otp = async (req, res) => {
 
 const verify_otp_update_mobile = async (req, res) => {
     try {
-        vendor.update_mobile(req.body).then(response => {
+        vendor.verify_otp_update_mobile(req.body).then(response => {
             if (response.status)
                 return res.status(200).send({ result: 'success' })
             else

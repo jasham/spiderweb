@@ -107,6 +107,7 @@ const active_vendor = async (id, active_status) => {
 const generate_otp = async (data) => {
     try {
         let otp = 123456
+        // Math.floor(100000 + Math.random() * 900000)
         const log = {
             otp : otp,
             credential_id : data.id
