@@ -106,6 +106,12 @@ loginUserRecord = async (loginObj) => {
         const getUser = await con.user.findOne({ credential_id: getCredential._id })
         const getServicesList = await con.vendor_group.find({ vendor_id: getUser._id, deleted: false })
         var user = {}
+        if (getUser.role_id === 2) {// only for vendor
+            const vendor = await con.vendor.findOne({ user_id: getUser._id })
+            user["vendor_status"] = vendor.status
+            user["vendor_isActive"] = vendor.active
+            user["vendor_id"] = vendor._id
+        }
         let tokenObj = {
             _id: getUser._id,
             uid: getCredential.uid

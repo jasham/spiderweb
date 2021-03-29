@@ -97,7 +97,7 @@ const active_vendor = async (id, active_status) => {
 
         const update_active_status = await con.vendor.updateOne({ _id: id }, updateObj)
         if (update_active_status.ok)
-            return { status: true,updateObj }
+            return { status: true, updateObj }
 
     } catch (error) {
         return { status: false, error: error.toString() }
