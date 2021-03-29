@@ -4,7 +4,6 @@ const router = require('express').Router()
 
 
 const add = (req, res) => {
-    console.log("Here is reached add")
     try {
         vendor.save(req.body).then(save_res => {
             if (save_res.status === 'exist')
@@ -65,7 +64,7 @@ const update_specific_sub_cat_grp = (req, res) => {
     }
 }
 
-const active = async (req, res) => {
+const active_vendor_service = async (req, res) => {
     try {
         vendor.active(req.params.id, req.params.status).then(update_status => {
             if (update_status.status)
@@ -141,7 +140,7 @@ router.post('/', add)
 router.get('/', list_all_sub_cat_grp)
 router.put('/', update_specific_sub_cat_grp)
 router.delete('/:id', del_specific_sub_cat_grp)
-router.get('/active/:id/:status', active)
+router.get('/vendor_service_status/:id/:status', active_vendor_service)
 router.get('/service_group', list_all_grp)
 router.patch('/vendor_status/:id/:status', active_vendor)
 router.post('/send_otp', generate_otp)
