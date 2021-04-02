@@ -21,19 +21,18 @@ signup = async (data) => {
         const saveCredential = await con.credential(data).save()
         data.credential_id = saveCredential._id
         const saveUser = await new con.user(data).save()
-    
+
         if (saveUser !== undefined) {
             if (data.role_id === 2) {// only for vendor
                 let vObj = {
                     status: 'Available',
                     user_id: saveUser._id
                 }
-               const saveVendor= await new con.vendor(vObj).save()
+                const saveVendor = await new con.vendor(vObj).save()
                 user["vendor_status"] = saveVendor.status
                 user["vendor_isActive"] = saveVendor.active
                 user["vendor_id"] = saveVendor._id
             }
-
             let tokenObj = {
                 _id: saveUser._id,
                 uid: saveCredential.uid
@@ -48,7 +47,7 @@ signup = async (data) => {
             user["credential_isActive"] = saveCredential.active
             user["role_id"] = saveUser.role_id
             user["uid"] = saveCredential.uid
-            user["token"] = token           
+            user["token"] = token
         }
         return { status: true, user }
     } catch (error) {
@@ -104,7 +103,18 @@ loginUserRecord = async (loginObj) => {
     try {
         const getCredential = await con.credential.findOne(loginObj)
         const getUser = await con.user.findOne({ credential_id: getCredential._id })
-        const getServicesList = await con.vendor_group.find({ vendor_id: getUser._id, deleted: false })
+        const getVendor = await con.vendor.findOne({ user_id: getUser._id })
+        const getVendorGrps = await con.vendor_group.find({ vendor_id: getVendor._id, deleted: false, active: true })
+        let vendorServices = []
+        getVendorGrps.forEach(async el => {
+            const getGrp = await con.group.findOne({ _id: el.group_id, deleted: false, active: true }, { group_name: 1 })
+            let obj={
+                group_name:getGrp.group_name,
+                group_id:el.group_id
+            }
+            
+            vendorServices.push(obj)
+        })
         var user = {}
         if (getUser.role_id === 2) {// only for vendor
             const vendor = await con.vendor.findOne({ user_id: getUser._id })
@@ -122,11 +132,12 @@ loginUserRecord = async (loginObj) => {
         user["email"] = getCredential.email
         user["mobile"] = getCredential.mobile
         user["name"] = getUser.name
-        user["user_status"] = getCredential.active
+        user["credential_isActive"] = getCredential.active
+        user["image_url"] = getUser.image_url
         user["uid"] = getCredential.uid
         user["role_id"] = getUser.role_id
         user["token"] = token
-        user["services"] = getServicesList
+        user["services"] = vendorServices
 
         return { status: true, user }
     } catch (error) {
