@@ -152,6 +152,31 @@ const verify_otp_update_mobile = async (data) => {
     }
 }
 
+const update_image = async (data) => {
+    try {
+        let fileObj = {
+            fileBase64: data.image_string,
+            ext: data.image_ext,
+            repository: data.repository
+        }
+        const imgSaveRes = await fs.uploadFile(fileObj)
+        if (imgSaveRes.status) {
+            delete data.image_string
+            delete data.image_ext
+            let image_url = data.hostUrl + imgSaveRes.imgPath
+            let image_name = imgSaveRes.image_name
+            delete data.hostUrl
+            const updatedImg = await new con.user.findOneAndUpdate({_id : data.userId}, {image_url: image_url, image_name: image_name}, { new: true}).save()
+            return { status: true, updatedImg }
+        }
+        else // if error from fs file
+            return { status: false, error: imgSaveRes.error }
+
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
 
 
 module.exports = {
@@ -163,5 +188,6 @@ module.exports = {
     active_vendor,
     list_sub_cat_grp,
     generate_otp,
-    verify_otp_update_mobile
+    verify_otp_update_mobile,
+    update_image
 }

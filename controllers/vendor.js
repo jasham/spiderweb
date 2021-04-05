@@ -134,6 +134,21 @@ const verify_otp_update_mobile = async (req, res) => {
     }
 }
 
+const update_image = (req, res) => {
+    try {
+        req.body.hostUrl = req.protocol + '://' + req.get('host')
+        req.body.repository = 'vendor'
+        vendor.update_image(req.body).then(img_res => {
+            if (img_res.status)
+                return res.status(200).send({ result: 'success', data: img_res.updatedImg })
+            else
+                return res.send({ result: 'fail', error: img_res.error, data: null })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
 
 
 router.post('/', add)
@@ -145,6 +160,7 @@ router.get('/service_group', list_all_grp)
 router.patch('/vendor_status/:id/:status', active_vendor)
 router.post('/send_otp', generate_otp)
 router.patch('/update_mobile', verify_otp_update_mobile)
+router.patch('/update_image', update_image)
 
 
 
