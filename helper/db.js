@@ -36,5 +36,6 @@ module.exports = {
     booking : require('../models/booking'),
     booking_service : require('../models/booking_service'),
     address : require('../models/address'),
-    otpLog : require('../models/otp_log')
+    otpLog : require('../models/otp_log'),
+    notification : require('../models/notification')
 }

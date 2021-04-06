@@ -8,6 +8,6 @@ const reviews = mongoose.Schema({
     ratings : {type : String},  
     service_id: {type : String},  
     vendor_id: {type : String}
-})
+},{timestamps:true})
 
 exports.modules = mongoose.model('Reviews',reviews)
