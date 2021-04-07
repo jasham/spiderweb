@@ -19,3 +19,5 @@ const add = (req, res) => {
 }
 
 router.post('/', add)
+
+module.exports = router;
