@@ -1,4 +1,5 @@
 const con = require('../helper/db')
+const { send_otp } = require('../helper/mobile_service')
 
 const save = async (data) => {
     try {
@@ -106,22 +107,25 @@ const active_vendor = async (id, active_status) => {
 
 const generate_otp = async (data) => {
     try {
-        let otp = 123456
-        // Math.floor(100000 + Math.random() * 900000)
+        // let otp = 123456
+        let otp = Math.floor(100000 + Math.random() * 900000)
         const log = {
             otp : otp,
             credential_id : data.id
         }
         const generate_otp = await new con.otpLog(log).save()
         if(generate_otp){
-            let message = `Thanks for choosing spider-way! Here is your 6-digits OTP to verify your mobile number. OTP : ${otp}`
-            /**
+            let messageRes = `A 6-digits OTP has sent to your mobile number. Kindly, check it.`
+            data.message = `Thanks for choosing spider-way! Here is your 6-digits OTP to verify your mobile number. OTP : ${otp}`
+                        /**
              *  CODE FOR SENDING OTP TO MOBILE
              * @params mobile
              * @params otp
              */
-
-            return { status: true, message}
+            let otpRes = await send_otp(data)
+            console.log( "sssss", otpRes);
+            if(otpRes.status) return { status: true, messageRes}
+            else return { status: false, messageRes: "Something went wrong while sending OTP."}
         }
 
     } catch (error) {

@@ -9,9 +9,9 @@ const Booking = mongoose.Schema({
     status: { type : String },
     address_id: { type : String },
     sub_category_id: {type:Schema.Types.ObjectId},
-    vendor_id : { type:Schema.Types.ObjectId,default:null},
+    vendor_id : { type:Schema.Types.ObjectId, default: null},
     user_id: {type:Schema.Types.ObjectId}
-})
+},{timestamps:true})
 
 
 module.exports = mongoose.model('Booking',Booking,'Booking')
