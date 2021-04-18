@@ -26,9 +26,7 @@ const save = async (data) => {
                 serviceNames.push({ service: bookService.service })
             })
             const userAddress = await con.address.findOne({ _id: data.address_id, user_id: data.user_id }, { latitude: 1, longitude: 1 })
-            const bookSubCategory = await con.sub_category.findOne({ _id: data.sub_category_id }, { sub_category: 1,group_id:1 })
-            //have to add data in notification table
-
+            const bookSubCategory = await con.sub_category.findOne({ _id: data.sub_category_id }, { sub_category: 1, group_id: 1 })
             const notificationDetails = {//this details go to vendor by io socket, can add more fields as per requirement
                 latitude: userAddress.latitude,
                 longitude: userAddress.longitude,
@@ -39,6 +37,17 @@ const save = async (data) => {
                 description: data.description,
                 booking_id: saveBookingRes._id,
                 group_id: bookSubCategory.group_id
+            }
+            const vendorGrp = await con.vendor_group.find({ group_id: bookSubCategory.group_id, active: true, approved: true }, { vendor_id: 1 })
+            if (vendorGrp.length > 0) {
+                vendorGrp.forEach(async el => {
+                    let notificationObj = {
+                        vendor_id: el.vendor_id,
+                        booking_id: saveBookingRes._id,
+                        notification_detail: notificationDetails,
+                    }
+                    const saveNotificationRes = await con.notification(notificationObj).save()
+                })
             }
             return { status: true, notificationDetails }
         }
@@ -80,22 +89,22 @@ const acceptByUser = async (user_id, booking_id) => {
     }
 }
 
-const rejectByUser = async (user_id,rejected_vendor_id, booking_id) => {
+const rejectByUser = async (user_id, rejected_vendor_id, booking_id) => {
     try {
         updObj = {
             status: 'Rejected By User',
-            vendor_id:null
+            vendor_id: null
         }
-        const rejectBookingRes = await con.booking.findOneAndUpdate({ _id: booking_id, user_id: user_id }, updObj,{new: true})
+        const rejectBookingRes = await con.booking.findOneAndUpdate({ _id: booking_id, user_id: user_id }, updObj, { new: true })
         if (rejectBookingRes) {
             let serviceNames = []
             const serviceIds = await con.booking_service.find({ booking_id: rejectBookingRes._id }, { service_id: 1 })
-            serviceIds.forEach(async (el) => {                
+            serviceIds.forEach(async (el) => {
                 const bookService = await con.service.findOne({ _id: el.service_id }, { service: 1 })
                 serviceNames.push({ service: bookService.service })
             })
             const userAddress = await con.address.findOne({ _id: rejectBookingRes.address_id, user_id: rejectBookingRes.user_id }, { latitude: 1, longitude: 1 })
-            const bookSubCategory = await con.sub_category.findOne({ _id: rejectBookingRes.sub_category_id }, { sub_category: 1,group_id:1 })
+            const bookSubCategory = await con.sub_category.findOne({ _id: rejectBookingRes.sub_category_id }, { sub_category: 1, group_id: 1 })
             // have to add data in notification table
 
             const detailsAfterRejectByUser = {
@@ -123,16 +132,16 @@ const cancelByUser = async (user_id, booking_id) => {
         updObj = {
             status: 'Cancelled By User'
         }
-        const cancelBookingRes = await con.booking.findOneAndUpdate({ _id: booking_id, user_id: user_id }, updObj,{new: true})
+        const cancelBookingRes = await con.booking.findOneAndUpdate({ _id: booking_id, user_id: user_id }, updObj, { new: true })
         if (cancelBookingRes) {
             let serviceNames = []
             const serviceIds = await con.booking_service.find({ booking_id: cancelBookingRes._id }, { service_id: 1 })
-            serviceIds.forEach(async (el) => {                
+            serviceIds.forEach(async (el) => {
                 const bookService = await con.service.findOne({ _id: el.service_id }, { service: 1 })
                 serviceNames.push({ service: bookService.service })
             })
             const userAddress = await con.address.findOne({ _id: cancelBookingRes.address_id, user_id: cancelBookingRes.user_id }, { latitude: 1, longitude: 1 })
-            const bookSubCategory = await con.sub_category.findOne({ _id: cancelBookingRes.sub_category_id }, { sub_category: 1,group_id:1 })
+            const bookSubCategory = await con.sub_category.findOne({ _id: cancelBookingRes.sub_category_id }, { sub_category: 1, group_id: 1 })
             // have to add data in notification table
 
             const detailsAfterCancelByUser = {
@@ -144,7 +153,7 @@ const cancelByUser = async (user_id, booking_id) => {
                 scheduled_time: rejectBookingRes.scheduled_time,
                 description: rejectBookingRes.description,
                 booking_id,
-                vendor_id:cancelBookingRes.vendor_id
+                vendor_id: cancelBookingRes.vendor_id
             }
             return { status: true, detailsAfterCancelByUser }
         }

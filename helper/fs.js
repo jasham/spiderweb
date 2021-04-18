@@ -8,8 +8,12 @@ const uploadFile = async (fileObj) => {//'fileObj' receive as object
     }
     try {
         const file_uid = uuid.v4()
-        fs.writeFileSync(`./uploads/${fileObj.repository}/` + file_uid + fileObj.ext, fileObj.fileBase64, { encoding: 'base64' })
-        const path = `/${fileObj.repository}/` + file_uid + fileObj.ext
+        let name = fileObj.name !== undefined ? (fileObj.name + '_') : '' // only for vendor & user
+        if (!fs.existsSync(`./uploads/${fileObj.repository}`))
+            fs.mkdirSync(`./uploads/${fileObj.repository}`)
+
+        fs.writeFileSync(`./uploads/${fileObj.repository}/` + name + file_uid + fileObj.ext, fileObj.fileBase64, { encoding: 'base64' })
+        const path = `/${fileObj.repository}/` + name + file_uid + fileObj.ext
         return { status: true, imgPath: path, image_name: file_uid + fileObj.ext }
     }
     catch (err) {

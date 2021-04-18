@@ -1,5 +1,6 @@
 const con = require('../helper/db')
 const { send_otp } = require('../helper/mobile_service')
+const fs = require('../helper/fs')
 
 const save = async (data) => {
     try {
@@ -161,17 +162,17 @@ const update_image = async (data) => {
         let fileObj = {
             fileBase64: data.image_string,
             ext: data.image_ext,
-            repository: data.repository
+            repository: data.repository,
+            name:data.name
         }
         const imgSaveRes = await fs.uploadFile(fileObj)
         if (imgSaveRes.status) {
             delete data.image_string
             delete data.image_ext
             let image_url = data.hostUrl + imgSaveRes.imgPath
-            let image_name = imgSaveRes.image_name
             delete data.hostUrl
-            const updatedImg = await new con.user.findOneAndUpdate({_id : data.userId}, {image_url: image_url, image_name: image_name}, { new: true}).save()
-            return { status: true, updatedImg }
+            const updatedImg = await con.user.findOneAndUpdate({_id : data.user_id}, {image_url: image_url}, { new: true})           
+            return { status: true, image_url: updatedImg.image_url }
         }
         else // if error from fs file
             return { status: false, error: imgSaveRes.error }
@@ -180,7 +181,6 @@ const update_image = async (data) => {
         return { status: false, error: error.toString() }
     }
 }
-
 
 
 module.exports = {

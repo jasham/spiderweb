@@ -103,24 +103,24 @@ loginUserRecord = async (loginObj) => {
     try {
         const getCredential = await con.credential.findOne(loginObj)
         const getUser = await con.user.findOne({ credential_id: getCredential._id })
-        const getVendor = await con.vendor.findOne({ user_id: getUser._id })
-        const getVendorGrps = await con.vendor_group.find({ vendor_id: getVendor._id, deleted: false, active: true })
-        let vendorServices = []
-        getVendorGrps.forEach(async el => {
-            const getGrp = await con.group.findOne({ _id: el.group_id, deleted: false, active: true }, { group_name: 1 })
-            let obj={
-                group_name:getGrp.group_name,
-                group_id:el.group_id
-            }
-            
-            vendorServices.push(obj)
-        })
         var user = {}
+        let vendorServices = []
         if (getUser.role_id === 2) {// only for vendor
+            const getVendor = await con.vendor.findOne({ user_id: getUser._id })
+            const getVendorGrps = await con.vendor_group.find({ vendor_id: getVendor._id, deleted: false, active: true })
+            getVendorGrps.forEach(async el => {
+                const getGrp = await con.group.findOne({ _id: el.group_id, deleted: false, active: true }, { group_name: 1 })
+                let obj = {
+                    group_name: getGrp.group_name,
+                    group_id: el.group_id
+                }
+                vendorServices.push(obj)
+            })
             const vendor = await con.vendor.findOne({ user_id: getUser._id })
             user["vendor_status"] = vendor.status
             user["vendor_isActive"] = vendor.active
             user["vendor_id"] = vendor._id
+            user["services"] = vendorServices
         }
         let tokenObj = {
             _id: getUser._id,
@@ -137,7 +137,6 @@ loginUserRecord = async (loginObj) => {
         user["uid"] = getCredential.uid
         user["role_id"] = getUser.role_id
         user["token"] = token
-        user["services"] = vendorServices
 
         return { status: true, user }
     } catch (error) {

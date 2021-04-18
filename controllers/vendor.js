@@ -23,7 +23,6 @@ const list_all_sub_cat_grp = (req, res) => {
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
         queryParams = JSON.parse(jsonStr)
-        console.log("Here is query params", queryParams)
         vendor.list(queryParams).then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.record })
@@ -140,12 +139,12 @@ const update_image = (req, res) => {
         req.body.repository = 'vendor'
         vendor.update_image(req.body).then(img_res => {
             if (img_res.status)
-                return res.status(200).send({ result: 'success', data: img_res.updatedImg })
+                return res.status(200).send({ result: 'success', image_url: img_res.image_url })
             else
-                return res.send({ result: 'fail', error: img_res.error, data: null })
+                return res.send({ result: 'fail', error: img_res.error })
         })
     } catch (error) {
-        return res.send({ result: 'fail', error: error.toString(), data: null })
+        return res.send({ result: 'fail', error: error.toString() })
     }
 }
 

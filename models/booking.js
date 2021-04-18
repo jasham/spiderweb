@@ -7,7 +7,7 @@ const Booking = mongoose.Schema({
     scheduled_time : { type : Date},
     description: { type : String },
     status: { type : String },
-    address_id: { type : String },
+    address_id: {type:Schema.Types.ObjectId},
     sub_category_id: {type:Schema.Types.ObjectId},
     vendor_id : { type:Schema.Types.ObjectId, default: null},
     user_id: {type:Schema.Types.ObjectId}
