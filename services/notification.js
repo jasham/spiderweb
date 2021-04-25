@@ -21,7 +21,7 @@ const list = async (queryParams) => {
         if (notList.length > 0) {
             notList.forEach(el => {
                 let obj = {
-                    user_id: el.user_id,
+                    //user_id: el.user_id,
                     notification_detail: el.notification_detail
                 }
                 notifications.push(obj)
