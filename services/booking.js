@@ -42,7 +42,7 @@ const save = async (data) => {
             if (vendorGrp.length > 0) {
                 vendorGrp.forEach(async el => {
                     let notificationObj = {
-                        vendor_id: el.vendor_id,
+                        notification_receiver_id: el.vendor_id,
                         booking_id: saveBookingRes._id,
                         notification_detail: notificationDetails,
                     }
