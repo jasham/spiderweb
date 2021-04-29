@@ -16,7 +16,7 @@ const list = async (queryParams) => {
         let notifications = []
         let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
         //let searchBy = queryParams.searchBy//searchBy can be user_id or vender_id
-        let qry = { notification_receiver_id: queryParams.search, is_seen: false, booking_id: null }
+        let qry = { notification_receiver_id: queryParams.notification_receiver_id, is_seen: false, booking_id: null }
         const notList = await con.notification.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
         if (notList.length > 0) {
             notList.forEach(el => {
