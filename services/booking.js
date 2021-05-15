@@ -71,6 +71,17 @@ const acceptByUser = async (user_id, booking_id) => {
             const address = await con.address.findById(booking.address_id)
             const bookedServices = await con.booking_service.find({ booking_id: booking_id }, { service_id: 1 })
             const subCategory = await con.sub_category.findById(booking.sub_category_id)
+            const notification_detail = {
+                scheduled_date: booking.scheduled_date,
+                scheduled_time: booking.scheduled_time,
+                sub_category: subCategory.sub_category,
+                address
+            }
+            const notificationObj = {
+                notification_receiver_id : booking.vendor_id,
+                notification_detail
+            }
+            const saveNotification = await con.notification(notificationObj).save()
             const detailsAfterAcceptByUser = {
                 name: user.name,
                 mobile: userCredential.mobile,
@@ -106,7 +117,6 @@ const rejectByUser = async (user_id, rejected_vendor_id, booking_id) => {
             const userAddress = await con.address.findOne({ _id: rejectBookingRes.address_id, user_id: rejectBookingRes.user_id }, { latitude: 1, longitude: 1 })
             const bookSubCategory = await con.sub_category.findOne({ _id: rejectBookingRes.sub_category_id }, { sub_category: 1, group_id: 1 })
             // have to add data in notification table
-
             const detailsAfterRejectByUser = {
                 latitude: userAddress.latitude,
                 longitude: userAddress.longitude,
@@ -118,6 +128,17 @@ const rejectByUser = async (user_id, rejected_vendor_id, booking_id) => {
                 group_id: bookSubCategory.group_id,
                 booking_id,
                 rejected_vendor_id
+            }
+            const vendorGrp = await con.vendor_group.find({ group_id: bookSubCategory.group_id, active: true, approved: true }, { vendor_id: 1 })
+            if (vendorGrp.length > 0){
+                vendorGrp.forEach(async el => {
+                    const notificationObj = {
+                        notification_receiver_id : el.vendor_id,
+                        notification_detail : detailsAfterRejectByUser,
+                        booking_id 
+                    }
+                    const saveNotification = await con.notification(notificationObj).save()
+                })
             }
             return { status: true, detailsAfterRejectByUser }
         }
@@ -143,7 +164,6 @@ const cancelByUser = async (user_id, booking_id) => {
             const userAddress = await con.address.findOne({ _id: cancelBookingRes.address_id, user_id: cancelBookingRes.user_id }, { latitude: 1, longitude: 1 })
             const bookSubCategory = await con.sub_category.findOne({ _id: cancelBookingRes.sub_category_id }, { sub_category: 1, group_id: 1 })
             // have to add data in notification table
-
             const detailsAfterCancelByUser = {
                 latitude: userAddress.latitude,
                 longitude: userAddress.longitude,
@@ -155,6 +175,12 @@ const cancelByUser = async (user_id, booking_id) => {
                 booking_id,
                 vendor_id: cancelBookingRes.vendor_id
             }
+            const notificationObj = {
+                notification_receiver_id : cancelBookingRes.vendor_id,
+                notification_detail : detailsAfterCancelByUser,
+                booking_id
+            }
+            const saveNotification = await con.notification(notificationObj).save()
             return { status: true, detailsAfterCancelByUser }
         }
 
@@ -193,6 +219,12 @@ const acceptByVendor = async (vendor_id, booking_id) => {
                     scheduled_time: booking.scheduled_time,
                     user_id: booking.user_id
                 }
+                const notificationObj = {
+                    notification_receiver_id : booking.user_id,
+                    notification_detail : detailsAfterAcceptByVendor,
+                    booking_id
+                }
+                const saveNotification = await con.notification(notificationObj).save()
                 return { status: true, detailsAfterAcceptByVendor }
             }
         }
