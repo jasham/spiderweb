@@ -74,7 +74,6 @@ const cancelByUser = (req, res) => {
 //#endregion
 
 //#region ---VENDOR SIDE EVENT---
-
 const acceptByVendor = (req, res) => {
     var result = 'fail'
     try {
@@ -96,7 +95,24 @@ const acceptByVendor = (req, res) => {
         res.send({ result, error: err.toString(), data: null })
     }
 }
+//#endregion
 
+//#region ---Common---
+const list = (req, res) => {
+    try {
+        let obj = eval('(' + req.query.query + ')')
+        let jsonStr = JSON.stringify(obj)
+        queryParams = JSON.parse(jsonStr)
+        notification.list(queryParams).then(list => {
+            if (list.status)
+                return res.status(200).send({ result: 'success', data: list.record })
+            else
+                return res.status(200).send({ result: 'fail', data: null, error: list.error })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
 //#endregion
 
 //#region ---USER Routing---
@@ -104,12 +120,14 @@ router.post('/', add)
 router.get('/acceptbyuser/:user_id/:booking_id', acceptByUser)
 router.get('/rejectbyuser/:user_id/:rejected_vendor_id/:booking_id', rejectByUser)
 router.get('/cancelbyuser/:vendor_id/:booking_id', cancelByUser)
-
 //#endregion
 
 //#region ---VENDOR Routing---
 router.get('/acceptbyvendor/:vendor_id/:booking_id', acceptByVendor)
+//#endregion
 
+//#region ---Common---
+router.get('/', list)
 //#endregion
 
 module.exports = router

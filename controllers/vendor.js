@@ -148,6 +148,21 @@ const update_image = (req, res) => {
     }
 }
 
+const newBooking = (req, res) => {
+    try {
+        let obj = eval('(' + req.query.query + ')')
+        let jsonStr = JSON.stringify(obj)
+        queryParams = JSON.parse(jsonStr)
+        vendor.newBookingList(queryParams).then(list => {
+            if (list.status)
+                return res.status(200).send({ result: 'success', data: list.record })
+            else
+                return res.status(200).send({ result: 'fail', data: null, error: list.error })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
 
 
 router.post('/', add)
@@ -160,7 +175,7 @@ router.patch('/vendor_status/:id/:status', active_vendor)
 router.post('/send_otp', generate_otp)
 router.patch('/update_mobile', verify_otp_update_mobile)
 router.patch('/update_image', update_image)
-
+router.get('/new_booking', newBooking)
 
 
 module.exports = router

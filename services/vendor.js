@@ -182,6 +182,27 @@ const update_image = async (data) => {
     }
 }
 
+const newBookingList = async (queryParams) => {
+    try {
+        let notifications = []
+        let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
+        let qry = { notification_receiver_id: queryParams.vendor_id, booking_id: { $ne: null } } //booking_id not null
+        const notificationBookingList = await con.notification.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
+        if (notificationBookingList.length > 0) {
+            notificationBookingList.forEach((el,index) => {
+                let booking = await con.booking.findById(el.booking_id, { booking_date: 1 })
+                if (booking.booking_date <= new Date()){
+                    notificationBookingList.splice(index,1) 
+                }
+            })
+        }
+        const totalRecords = await con.notification.countDocuments(qry)
+        return { status: true, record: { notifications, totalRecords, currentPage: queryParams.currentPage } }
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
 
 module.exports = {
     save,
@@ -193,5 +214,6 @@ module.exports = {
     list_sub_cat_grp,
     generate_otp,
     verify_otp_update_mobile,
-    update_image
+    update_image,
+    newBookingList
 }

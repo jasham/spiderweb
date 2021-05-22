@@ -35,6 +35,7 @@ const save = async (data) => {
                 scheduled_date: data.scheduled_date,
                 scheduled_time: data.scheduled_time,
                 description: data.description,
+                booking_date:saveBookingRes.saveBookingRes,
                 booking_id: saveBookingRes._id,
                 group_id: bookSubCategory.group_id
             }
@@ -203,11 +204,43 @@ const acceptByVendor = async (vendor_id, booking_id) => {
 }
 //#endregion
 
+//#region ---Common---
+const list = async (queryParams) => {
+    try {
+        let notifications = []
+        let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
+        let qry = { notification_receiver_id: queryParams.notification_receiver_id, is_seen: false, booking_id: null }
+        const notList = await con.notification.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
+        if (notList.length > 0) {
+            notList.forEach(el => {
+                let obj = {
+                    //user_id: el.user_id,
+                    notification_detail: el.notification_detail
+                }
+                notifications.push(obj)
+            })
+        }
+        const totalRecords = await con.notification.countDocuments(qry)
+        return { status: true, record: { notifications, totalRecords, currentPage: queryParams.currentPage } }
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+//#endregion
 
 module.exports = {
+    //#region ---User---
     save,
-    acceptByVendor,
     acceptByUser,
     rejectByUser,
-    cancelByUser
+    cancelByUser,
+    //#endregion
+
+    //#region ---Vendor---
+    acceptByVendor,
+    //#endregion
+
+    //#region ---Common---
+    list,
+    //#endregion
 }
