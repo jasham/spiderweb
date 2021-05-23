@@ -189,8 +189,8 @@ const newBookingList = async (queryParams) => {
         let qry = { notification_receiver_id: queryParams.vendor_id, booking_id: { $ne: null } } //booking_id not null
         const notificationBookingList = await con.notification.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
         if (notificationBookingList.length > 0) {
-            notificationBookingList.forEach((el,index) => {
-                let booking = await con.booking.findById(el.booking_id, { booking_date: 1 })
+            notificationBookingList.forEach( async (el,index) => {
+                const booking = await con.booking.findById(el.booking_id, { booking_date: 1 })
                 if (booking.booking_date <= new Date()){
                     notificationBookingList.splice(index,1) 
                 }

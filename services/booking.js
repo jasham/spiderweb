@@ -13,6 +13,7 @@ const save = async (data) => {
             sub_category_id: data.sub_category_id,
         }
         const saveBookingRes = await con.booking(bookingObj).save()
+        console.log("1234567898765432123456789", saveBookingRes);
         if (saveBookingRes) {
             let serviceIds = data.serviceIds
             let serviceNames = []
@@ -35,11 +36,12 @@ const save = async (data) => {
                 scheduled_date: data.scheduled_date,
                 scheduled_time: data.scheduled_time,
                 description: data.description,
-                booking_date:saveBookingRes.saveBookingRes,
+                booking_date:saveBookingRes.booking_date,
                 booking_id: saveBookingRes._id,
                 group_id: bookSubCategory.group_id
             }
             const vendorGrp = await con.vendor_group.find({ group_id: bookSubCategory.group_id, active: true, approved: true }, { vendor_id: 1 })
+            console.log("qwertyuio", notificationDetails, vendorGrp);
             if (vendorGrp.length > 0) {
                 vendorGrp.forEach(async el => {
                     let notificationObj = {
@@ -47,6 +49,7 @@ const save = async (data) => {
                         booking_id: saveBookingRes._id,
                         notification_detail: notificationDetails,
                     }
+                    console.log("qwertyuio1234567890", notificationObj);
                     const saveNotificationRes = await con.notification(notificationObj).save()
                 })
             }

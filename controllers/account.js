@@ -135,10 +135,10 @@ adminSignUp = (req, res) => {
 }
 
 
-router.post('/userlogin', validate(userLoginValidator), userLogin)
-router.post('/adminlogin', validate(userLoginValidator), adminLogin)
+router.post('/userlogin', validate(userLoginValidator), userLogin) 
+router.post('/adminlogin', validate(userLoginValidator), adminLogin) //Used for admin and vendor
 router.post('/usersignup', validate(userSignUpValidator), userSignup)
 router.post('/vendorsignup', validate(userSignUpValidator), vendorSignup)
-router.post('/adminsignup', validate(userSignUpValidator), adminSignUp)
+router.post('/adminsignup', validate(userSignUpValidator), adminSignUp) //1
 
 module.exports = router;
