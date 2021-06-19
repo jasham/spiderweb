@@ -2,7 +2,6 @@ const con = require("../helper/db");
 const axios = require('axios')
 
 //#region ---USER SIDE EVENTs---
-<<<<<<< HEAD
 const save1 = async (data) => {
   try {
     let bookingObj = {
@@ -71,68 +70,6 @@ const save1 = async (data) => {
         });
       }
       return { status: true, notificationDetails };
-=======
-const save = async (data) => {
-    try {
-        let bookingObj = {
-            scheduled_date: data.scheduled_date,
-            scheduled_time: data.scheduled_time,
-            description: data.description,
-            status: 'New',
-            address_id: data.address_id,
-            user_id: data.user_id,
-            sub_category_id: data.sub_category_id,
-        }
-        const saveBookingRes = await con.booking(bookingObj).save()
-        console.log("1234567898765432123456789", saveBookingRes);
-        if (saveBookingRes) {
-            let serviceIds = data.serviceIds
-            let serviceNames = []
-            serviceIds.forEach(async (el) => {
-                let bSeviceObj = {
-                    service_id: el.service_id,
-                    booking_id: saveBookingRes._id
-                }
-                await con.booking_service(bSeviceObj).save()
-                const bookService = await con.service.findOne({ _id: el.service_id }, { service: 1 })
-                serviceNames.push({ service: bookService.service })
-            })
-            const userAddress = await con.address.findOne({ _id: data.address_id, user_id: data.user_id }, { latitude: 1, longitude: 1 })
-            const bookSubCategory = await con.sub_category.findOne({ _id: data.sub_category_id }, { sub_category: 1, group_id: 1 })
-            const notificationDetails = {//this details go to vendor by io socket, can add more fields as per requirement
-                latitude: userAddress.latitude,
-                longitude: userAddress.longitude,
-                sub_category: bookSubCategory.sub_category,
-                services: serviceNames,
-                scheduled_date: data.scheduled_date,
-                scheduled_time: data.scheduled_time,
-                description: data.description,
-                booking_date:saveBookingRes.booking_date,
-                booking_id: saveBookingRes._id,
-                group_id: bookSubCategory.group_id
-            }
-            const vendorGrp = await con.vendor_group.find({ group_id: bookSubCategory.group_id, active: true, approved: true }, { vendor_id: 1 })
-            console.log("qwertyuio", notificationDetails, vendorGrp);
-            if (vendorGrp.length > 0) {
-                let vendorNotiArr = []
-                vendorGrp.forEach( async el => {
-                    let notificationObj = {
-                        notification_receiver_id: el.vendor_id,
-                        booking_id: saveBookingRes._id,
-                        notification_detail: notificationDetails,
-                    }
-                    vendorNotiArr.push(notificationObj)
-                    console.log("qwertyuio1234567890", notificationObj)
-                })
-                const saveNotificationRes = await con.notification.create(vendorNotiArr)
-            }
-            return { status: true, notificationDetails }
-        }
-        return { status: false, error: 'something wrong to save data in booking' }
-
-    } catch (error) {
-        return { status: false, error: error.toString() }
->>>>>>> 7a336f7e5a355905e4447bc3ea6810c7cf57be95
     }
     return { status: false, error: "something wrong to save data in booking" };
   } catch (error) {
