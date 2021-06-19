@@ -43,15 +43,17 @@ const save = async (data) => {
             const vendorGrp = await con.vendor_group.find({ group_id: bookSubCategory.group_id, active: true, approved: true }, { vendor_id: 1 })
             console.log("qwertyuio", notificationDetails, vendorGrp);
             if (vendorGrp.length > 0) {
-                vendorGrp.forEach(async el => {
+                let vendorNotiArr = []
+                vendorGrp.forEach( async el => {
                     let notificationObj = {
                         notification_receiver_id: el.vendor_id,
                         booking_id: saveBookingRes._id,
                         notification_detail: notificationDetails,
                     }
-                    console.log("qwertyuio1234567890", notificationObj);
-                    const saveNotificationRes = await con.notification(notificationObj).save()
+                    vendorNotiArr.push(notificationObj)
+                    console.log("qwertyuio1234567890", notificationObj)
                 })
+                const saveNotificationRes = await con.notification.create(vendorNotiArr)
             }
             return { status: true, notificationDetails }
         }
