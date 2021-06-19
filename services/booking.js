@@ -57,17 +57,17 @@ const save1 = async (data) => {
       );
       console.log("qwertyuio", notificationDetails, vendorGrp);
       if (vendorGrp.length > 0) {
-        vendorGrp.forEach(async (el) => {
-          let notificationObj = {
-            notification_receiver_id: el.vendor_id,
-            booking_id: saveBookingRes._id,
-            notification_detail: notificationDetails,
-          };
-          console.log("qwertyuio1234567890", notificationObj);
-          const saveNotificationRes = await con
-            .notification(notificationObj)
-            .save();
-        });
+          let vendorNotificationArr = []
+            vendorGrp.forEach(async (el) => {
+            let notificationObj = {
+                notification_receiver_id: el.vendor_id,
+                booking_id: saveBookingRes._id,
+                notification_detail: notificationDetails,
+            };
+            console.log("qwertyuio1234567890", notificationObj);
+            vendorNotificationArr.push(notificationObj)
+            });
+        const saveNotificationRes = await con.notification.create(vendorNotificationArr)
       }
       return { status: true, notificationDetails };
     }
