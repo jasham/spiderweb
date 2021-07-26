@@ -32,7 +32,7 @@ const save1 = async (data) => {
       });
       const userAddress = await con.address.findOne(
         { _id: data.address_id, user_id: data.user_id },
-        { latitude: 1, longitude: 1 }
+        { latitude: 1, longitude: 1, city:1, state:1}
       );
       const bookSubCategory = await con.sub_category.findOne(
         { _id: data.sub_category_id },
@@ -51,21 +51,29 @@ const save1 = async (data) => {
         booking_id: saveBookingRes._id,
         group_id: bookSubCategory.group_id,
       };
-      const vendorGrp = await con.vendor_group.find(
-        { group_id: bookSubCategory.group_id, active: true, approved: true },
-        { vendor_id: 1 }
-      );
+    //   const vendorGrp = await con.vendor_group.find(
+    //     { group_id: bookSubCategory.group_id, active: true, approved: true },
+    //     { vendor_id: 1 }
+    //   );
+      const vendorGrp = await con.address.aggregate([
+        {$match: {city: userAddress.city, state: userAddress.state}},
+        { $lookup: {from: 'Vendor_FCM_Tokens', localField: 'user_id', foreignField: 'vendor_id', as: 'token'} },
+        { $lookup: {from: 'Vendors', localField: 'user_id', foreignField: 'user_id', as: 'vendor'} },
+        {$unwind: "$vendor"},
+        { $lookup: {from: 'VendorGroups', localField: 'vendor.user_id', foreignField: 'vendor_id', as: 'vendorGroup'} },
+        {$unwind: "$vendorGroup"},
+      ]);
       console.log("qwertyuio", notificationDetails, vendorGrp);
       if (vendorGrp.length > 0) {
           let vendorNotificationArr = []
             vendorGrp.forEach(async (el) => {
-            let notificationObj = {
-                notification_receiver_id: el.vendor_id,
-                booking_id: saveBookingRes._id,
-                notification_detail: notificationDetails,
-            };
-            console.log("qwertyuio1234567890", notificationObj);
-            vendorNotificationArr.push(notificationObj)
+                let notificationObj = {
+                    notification_receiver_id: el.vendorGroup.vendor_id,
+                    booking_id: saveBookingRes._id,
+                    notification_detail: notificationDetails,
+                };
+                console.log("qwertyuio1234567890", notificationObj);
+                vendorNotificationArr.push(notificationObj)
             });
         const saveNotificationRes = await con.notification.create(vendorNotificationArr)
       }
@@ -86,7 +94,7 @@ const save = async (data) => {
       try {
         
         const res = await axios.post("https://us-central1-spider-d2a9d.cloudfunctions.net/paymentNotification",notiData);
-        console.log("Here is response ninja 873482783",res)
+        console.log("Here is response ninja 873482783",res)``
       } catch (err) {
         console.error(err);
       }
