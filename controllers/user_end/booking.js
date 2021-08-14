@@ -1,6 +1,7 @@
 const booking = require('../../services/booking')
 const router = require('express').Router()
 
+// no use of this fuction need to delete
 const add = (req, res) => {
     try {
         booking.save(req.body).then(status => {

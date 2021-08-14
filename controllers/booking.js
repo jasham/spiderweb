@@ -95,6 +95,27 @@ const acceptByVendor = (req, res) => {
         res.send({ result, error: err.toString(), data: null })
     }
 }
+
+const addVendorPlacedBid = (req, res) => {
+    var result = 'fail'
+    try {
+        bookingService.vendorPlacedBid(req.body).then(placedBidRes => {
+            if (placedBidRes.status === 'alreadyPlacedBid') {
+                result = 'alreadyPlacedBid'
+                return res.status(200).send({ result })
+            }
+            else if (placedBidRes.status) {
+                result = 'success'
+                req.app.io.emit('vendorPlacedBid', placedBidRes.detailsAfterPlacedBid)
+                return res.status(200).send({ result })
+            }
+            else
+                res.send({ result, error: acceptRes.error, data: null })
+        })
+    } catch (err) {
+        res.send({ result, error: err.toString(), data: null })
+    }
+}
 //#endregion
 
 //#region ---Common---
@@ -124,6 +145,7 @@ router.get('/cancelbyuser/:vendor_id/:booking_id', cancelByUser)
 
 //#region ---VENDOR Routing---
 router.get('/acceptbyvendor/:vendor_id/:booking_id', acceptByVendor)
+router.post('/vendorplacebid', addVendorPlacedBid)
 //#endregion
 
 //#region ---Common---
