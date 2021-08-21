@@ -54,7 +54,7 @@ const remove_cat_sub_service = async (image_id) => {
                 fileName: existImage.image_name,
                 repository: 'images'
             }
-            
+
             const imgDelRes = await fs.deleteFile(fileObj)
             if (detImg)
                 return { status: true }
@@ -67,19 +67,19 @@ const remove_cat_sub_service = async (image_id) => {
     }
 }
 
-const active_cat_sub_service = async (image_id, _id, image,type,activeStatus) => {
+const active_cat_sub_service = async (image_id, _id, image, type, activeStatus) => {
     try {
         let qry = {}
         if (image === 'category')
-            qry = { category_id: _id,type:type }
+            qry = { category_id: _id, type: type }
         else if (image === 'sub_category')
-            qry = { sub_category_id: _id,type:type }
+            qry = { sub_category_id: _id, type: type }
         else//service
-            qry = { service_id: _id ,type:type}
+            qry = { service_id: _id, type: type }
 
         const updateFalse = await con.image.updateMany(qry, { active: false })
         if (updateFalse.ok) {
-            const updateTrue = await con.image.findByIdAndUpdate(image_id, { active: activeStatus})
+            const updateTrue = await con.image.findByIdAndUpdate(image_id, { active: activeStatus })
             return { status: true }
         }
         return { status: false, error: 'somthing wrong to update image status false' }
@@ -89,10 +89,22 @@ const active_cat_sub_service = async (image_id, _id, image,type,activeStatus) =>
     }
 }
 
+const vendor_banner_list = async () => {
+    console.log("calling")
+    try {
+        let qry = { deleted: false, type: 'Banner', sub_category_id: { $ne: null } }//sub_category_id not null
+        const banners = await con.image.find(qry, { image_url: 1,image_name:1 }).sort({ _id: -1 }).limit(3)
+        return { status: true, banners }
+
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
 
 module.exports = {
     save_cat_sub_service,
     list_cat_sub_service,
     remove_cat_sub_service,
-    active_cat_sub_service
+    active_cat_sub_service,
+    vendor_banner_list
 }

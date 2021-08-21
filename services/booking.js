@@ -13,8 +13,8 @@ const save1 = async (data) => {
       user_id: data.user_id,
       sub_category_id: data.sub_category_id,
     };
-    const saveBookingRes = await con.booking(bookingObj).save();
-    console.log("1234567898765432123456789", saveBookingRes);
+    const saveBookingRes = await con.booking(bookingObj).save()
+    console.log("1234567898765432123456789", saveBookingRes)
     if (saveBookingRes) {
       let serviceIds = data.serviceIds;
       let serviceNames = [];
@@ -23,7 +23,7 @@ const save1 = async (data) => {
           service_id: el.service_id,
           booking_id: saveBookingRes._id,
         };
-        await con.booking_service(bSeviceObj).save();
+        await con.booking_service(bSeviceObj).save()
         const bookService = await con.service.findOne(
           { _id: el.service_id },
           { service: 1 }
@@ -50,7 +50,7 @@ const save1 = async (data) => {
         booking_date: saveBookingRes.booking_date,
         booking_id: saveBookingRes._id,
         group_id: bookSubCategory.group_id,
-      };
+      }
       //   const vendorGrp = await con.vendor_group.find(
       //     { group_id: bookSubCategory.group_id, active: true, approved: true },
       //     { vendor_id: 1 }
@@ -62,8 +62,8 @@ const save1 = async (data) => {
         { $unwind: "$vendor" },
         { $lookup: { from: 'VendorGroups', localField: 'vendor.user_id', foreignField: 'vendor_id', as: 'vendorGroup' } },
         { $unwind: "$vendorGroup" },
-      ]);
-      console.log("qwertyuio", notificationDetails, vendorGrp);
+      ])
+      console.log("qwertyuio", notificationDetails, vendorGrp)
       if (vendorGrp.length > 0) {
         let vendorNotificationArr = []
         vendorGrp.forEach(async (el) => {
@@ -72,16 +72,16 @@ const save1 = async (data) => {
             booking_id: saveBookingRes._id,
             notification_detail: notificationDetails,
           };
-          console.log("qwertyuio1234567890", notificationObj);
+          console.log("qwertyuio1234567890", notificationObj)
           vendorNotificationArr.push(notificationObj)
         });
         const saveNotificationRes = await con.notification.create(vendorNotificationArr)
       }
-      return { status: true, notificationDetails };
+      return { status: true, notificationDetails }
     }
-    return { status: false, error: "something wrong to save data in booking" };
+    return { status: false, error: "something wrong to save data in booking" }
   } catch (error) {
-    return { status: false, error: error.toString() };
+    return { status: false, error: error.toString() }
   }
 };
 
@@ -334,7 +334,7 @@ const vendorPlacedBid = async (data) => {
   try {
     const exist = await con.vendor_bid_on_booking.exists({ booking_id: data.booking_id, vendor_id: data.vendor_id })
 
-    if (exist) return { status: "alreadyPlacedBid" }
+    if (exist) return { status: "alreadyBidPlaced" }
     else {
       const saveBidRes = await con.vendor_bid_on_booking(data).save()
       if (saveBidRes) {
@@ -364,43 +364,86 @@ const vendorPlacedBid = async (data) => {
     return { status: false, error: error.toString() }
   }
 }
+
 //#endregion
 
 //#region ---Common---
-const list = async (queryParams) => {
+const allBookingFor_Vendor_User = async (queryParams) => {
   try {
-    let notifications = []
+    let bookings = []
     let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
     let qry = {
-      notification_receiver_id: queryParams.notification_receiver_id,
-      is_seen: false,
-      booking_id: null,
-    };
-    const notList = await con.notification.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
-    if (notList.length > 0) {
-      notList.forEach((el) => {
-        let obj = {
-          //user_id: el.user_id,
-          notification_detail: el.notification_detail,
-        };
-        notifications.push(obj);
-      });
+      vendor_id: queryParams.vendor_id,
+      user_id: queryParams.user_id,
+      status: queryParams.status
     }
-    const totalRecords = await con.notification.countDocuments(qry);
-    return {
-      status: true,
-      record: {
-        notifications,
-        totalRecords,
-        currentPage: queryParams.currentPage,
-      },
-    };
-  } catch (error) {
-    return { status: false, error: error.toString() };
-  }
-};
-//#endregion
+    if (queryParams.role.toLower() === 'vendor')
+      delete qry.user_id
+    else//user
+      delete qry.vendor_id
 
+    const booking = await con.booking.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
+    if (booking.length > 0) {
+      booking.forEach(async (el) => {
+        let service_arr = []
+        const sub_cate = await con.sub_category.findOne({ _id: el.sub_category_id }, { sub_category: 1, description: 1, amount: 1 })
+        const address = await con.address.findOne({ _id: el.address_id }, { __v: 0 })
+        const bookingServices = await con.booking_service.find({ booking_id: el._id }, { service_id: 1 })
+        if (bookingServices.length > 0) {
+          bookingServices.forEach(async (bs) => {
+            const service = await con.service.findOne({ _id: bs.service_id }, { service: 1 })
+            service_arr.push(service)
+          })
+        }
+        let obj = {
+          sub_category: sub_cate,
+          address: address,
+          services: service_arr
+        }
+        bookings.push(obj)
+      })
+    }
+    const totalRecords = await con.booking.countDocuments(qry)
+    return { status: true, record: { bookings, totalRecords, currentPage: queryParams.currentPage } }
+    // leter has to use aggregate for above code
+    // const vendorGrp = await con.sub_category.aggregate([
+    //   { $match: { _id: booking.sub_category_id } },
+    //   { $lookup: { from: 'Address', localField: 'user_id', foreignField: 'vendor_id', as: 'token' } },
+    //   { $lookup: { from: 'Vendors', localField: 'user_id', foreignField: 'user_id', as: 'vendor' } },
+    //   { $unwind: "$vendor" },
+    //   { $lookup: { from: 'VendorGroups', localField: 'vendor.user_id', foreignField: 'vendor_id', as: 'vendorGroup' } },
+    //   { $unwind: "$vendorGroup" },
+    // ])
+  } catch (error) {
+    return { status: false, error: error.toString() }
+  }
+}
+
+const praposalFor_Vendor_User = async (queryParams) => {
+  try {
+    let praposals = []
+    let skipRecords = queryParams.pageSize * (queryParams.currentPage - 1)
+    let qry = {booking_id: queryParams.booking_id}
+
+    const VendorPraposals = await con.vendor_praposal_on_booking.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
+    if (VendorPraposals.length > 0) {
+      VendorPraposals.forEach(async (el) => {
+        const vendor = await con.vendor.findOne({ _id: el.vendor_id }, { user_id: 1 })
+        const user = await con.user.findOne({ _id: vendor.user_id }, { name: 1, image_url: 1 })
+        let obj = {
+          praposal_detail:el,
+          vendor_detail:user
+        }
+        praposals.push(obj)
+      })
+    }
+    const totalRecords = await con.vendor_praposal_on_booking.countDocuments(qry)
+    return { status: true, record: { praposals, totalRecords, currentPage: queryParams.currentPage } }
+  } catch (error) {
+    return { status: false, error: error.toString() }
+  }
+}
+//#endregion
 
 
 module.exports = {
@@ -417,6 +460,7 @@ module.exports = {
   //#endregion
 
   //#region ---Common---
-  list,
+  allBookingFor_Vendor_User,
+  praposalFor_Vendor_User,
   //#endregion
-};
+}

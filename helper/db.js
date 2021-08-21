@@ -33,7 +33,7 @@ module.exports = {
     vendor_group: require('../models/vendor_group'),
     booking : require('../models/booking'),
     booking_service : require('../models/booking_service'),
-    vendor_bid_on_booking : require('../models/vendor_bid'),
+    vendor_praposal_on_booking : require('../models/vendor_praposal'),
     address : require('../models/address'),
     otpLog : require('../models/otp_log'),
     notification : require('../models/notification'),

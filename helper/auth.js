@@ -21,9 +21,7 @@ checkAuthentication = (req, res, next) => {
         else if (err.name === 'JsonWebTokenError') {
         }
       }
-
       next()
-
     })
   }
   else {

@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const { booking } = require('../helper/db')
 const bookingService = require('../services/booking')
 
 //#region ---USER SIDE EVENT---
@@ -100,8 +101,8 @@ const addVendorPlacedBid = (req, res) => {
     var result = 'fail'
     try {
         bookingService.vendorPlacedBid(req.body).then(placedBidRes => {
-            if (placedBidRes.status === 'alreadyPlacedBid') {
-                result = 'alreadyPlacedBid'
+            if (placedBidRes.status === 'alreadyBidPlaced') {
+                result = 'exist'
                 return res.status(200).send({ result })
             }
             else if (placedBidRes.status) {
@@ -119,12 +120,28 @@ const addVendorPlacedBid = (req, res) => {
 //#endregion
 
 //#region ---Common---
-const list = (req, res) => {
+const all_booking_by_status_role = (req, res) => {
     try {
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
         queryParams = JSON.parse(jsonStr)
-        notification.list(queryParams).then(list => {
+        bookingService.allBookingFor_Vendor_User(queryParams).then(list => {
+            if (list.status)
+                return res.status(200).send({ result: 'success', data: list.record })
+            else
+                return res.status(200).send({ result: 'fail', data: null, error: list.error })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
+const praposal_by_bookingid = (req, res) => {
+    try {
+        let obj = eval('(' + req.query.query + ')')
+        let jsonStr = JSON.stringify(obj)
+        queryParams = JSON.parse(jsonStr)
+        bookingService.praposalFor_Vendor_User(queryParams).then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.record })
             else
@@ -149,7 +166,8 @@ router.post('/vendorplacebid', addVendorPlacedBid)
 //#endregion
 
 //#region ---Common---
-router.get('/', list)
+router.get('/all_booking', all_booking_by_status_role)
+router.get('/praposal', praposal_by_bookingid)
 //#endregion
 
 module.exports = router

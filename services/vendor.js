@@ -1,6 +1,8 @@
 const con = require('../helper/db')
 const { send_otp } = require('../helper/mobile_service')
 const fs = require('../helper/fs')
+const image = require('../services/image')
+const sub_category = require('../services/sub_category')
 
 const save = async (data) => {
     try {
@@ -85,15 +87,15 @@ const list_sub_cat_grp = async () => {
 const active_vendor = async (id, active_status) => {
     try {
         let updateObj = {}
-        if (active_status === 'true'){
+        if (active_status === 'true') {
             update = {
-                active : true,
-                status : 'Available'
+                active: true,
+                status: 'Available'
             }
-        }else {
+        } else {
             update = {
-                active : false,
-                status : 'Unavailable'
+                active: false,
+                status: 'Unavailable'
             }
         }
 
@@ -111,22 +113,22 @@ const generate_otp = async (data) => {
         // let otp = 123456
         let otp = Math.floor(100000 + Math.random() * 900000)
         const log = {
-            otp : otp,
-            credential_id : data.id
+            otp: otp,
+            credential_id: data.id
         }
         const generate_otp = await new con.otpLog(log).save()
-        if(generate_otp){
+        if (generate_otp) {
             let messageRes = `A 6-digits OTP has sent to your mobile number. Kindly, check it.`
             data.message = `Thanks for choosing spider-way! Here is your 6-digits OTP to verify your mobile number. OTP : ${otp}`
-                        /**
-             *  CODE FOR SENDING OTP TO MOBILE
-             * @params mobile
-             * @params otp
-             */
+            /**
+ *  CODE FOR SENDING OTP TO MOBILE
+ * @params mobile
+ * @params otp
+ */
             let otpRes = await send_otp(data)
-            console.log( "sssss", otpRes);
-            if(otpRes.status) return { status: true, messageRes}
-            else return { status: false, messageRes: "Something went wrong while sending OTP."}
+            console.log("sssss", otpRes);
+            if (otpRes.status) return { status: true, messageRes }
+            else return { status: false, messageRes: "Something went wrong while sending OTP." }
         }
 
     } catch (error) {
@@ -137,20 +139,20 @@ const generate_otp = async (data) => {
 const verify_otp_update_mobile = async (data) => {
     try {
         const verify = {
-            otp : data.otp,
-            used : false,
-            credential_id : data.id
+            otp: data.otp,
+            used: false,
+            credential_id: data.id
         }
         const verify_otp = await con.otpLog.findOne(verify)
-        if(verify_otp){
+        if (verify_otp) {
             const update = {
                 mobile: data.mobile
             }
             const update_mobile = await new con.credential.updateOne({ _id: id }, update)
             if (update_mobile.ok)
                 return { status: true }
-        } else return { status : false, error: 'Otp is incorrect / already used'}
-        
+        } else return { status: false, error: 'Otp is incorrect / already used' }
+
 
     } catch (error) {
         return { status: false, error: error.toString() }
@@ -163,7 +165,7 @@ const update_image = async (data) => {
             fileBase64: data.image_string,
             ext: data.image_ext,
             repository: data.repository,
-            name:data.name
+            name: data.name
         }
         const imgSaveRes = await fs.uploadFile(fileObj)
         if (imgSaveRes.status) {
@@ -171,13 +173,25 @@ const update_image = async (data) => {
             delete data.image_ext
             let image_url = data.hostUrl + imgSaveRes.imgPath
             delete data.hostUrl
-            const updatedImg = await con.user.findOneAndUpdate({_id : data.user_id}, {image_url: image_url}, { new: true})           
+            const updatedImg = await con.user.findOneAndUpdate({ _id: data.user_id }, { image_url: image_url }, { new: true })
             return { status: true, image_url: updatedImg.image_url }
         }
         else // if error from fs file
             return { status: false, error: imgSaveRes.error }
 
     } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
+const update_basic_profile = async (data) => {
+    try {
+        const update_user = await con.user.updateOne({ _id: data.user_id }, { name: data.name })
+        const update_credential = await con.credential.updateOne({ _id: data.credential_id }, { email: data.email })
+        if (update_user.ok && update_credential.ok)
+            return { status: true }
+    }
+    catch (error) {
         return { status: false, error: error.toString() }
     }
 }
@@ -189,10 +203,10 @@ const newBookingList = async (queryParams) => {
         let qry = { notification_receiver_id: queryParams.vendor_id, booking_id: { $ne: null } } //booking_id not null
         const notificationBookingList = await con.notification.find(qry, { __v: 0 }, { skip: skipRecords, limit: queryParams.pageSize }).sort({ _id: -1 })
         if (notificationBookingList.length > 0) {
-            notificationBookingList.forEach( async (el,index) => {
+            notificationBookingList.forEach(async (el, index) => {
                 const booking = await con.booking.findById(el.booking_id, { booking_date: 1 })
-                if (booking.booking_date <= new Date()){
-                    notificationBookingList.splice(index,1) 
+                if (booking.booking_date <= new Date()) {
+                    notificationBookingList.splice(index, 1)
                 }
             })
         }
@@ -203,6 +217,23 @@ const newBookingList = async (queryParams) => {
     }
 }
 
+const bannerList = async () => {
+    try {
+        const banner_res = await image.vendor_banner_list()
+        return banner_res
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
+
+const listDetailedSubCategoryforVendor = async () => {
+    try {
+        const sub_cate_res = await sub_category.listDetailedSubCategory()
+        return sub_cate_res
+    } catch (error) {
+        return { status: false, error: error.toString() }
+    }
+}
 
 module.exports = {
     save,
@@ -215,5 +246,8 @@ module.exports = {
     generate_otp,
     verify_otp_update_mobile,
     update_image,
-    newBookingList
+    update_basic_profile,
+    newBookingList,
+    bannerList,
+    listDetailedSubCategoryforVendor,
 }

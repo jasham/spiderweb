@@ -148,7 +148,21 @@ const update_image = (req, res) => {
     }
 }
 
-const newBooking = (req, res) => {
+const update_basic_profile = async (req, res) => {
+    try {
+        vendor.update_basic_profile(req.body).then(response => {
+            if (response.status)
+                return res.status(200).send({ result: 'success' })
+            else
+                return res.status(200).send({ result: 'fail', error: response.error })
+        })
+    }
+    catch (error) {
+        return res.send({ result: 'fail', error: error.toString() })
+    }
+}
+
+const list_new_booking = (req, res) => {
     try {
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
@@ -156,6 +170,32 @@ const newBooking = (req, res) => {
         vendor.newBookingList(queryParams).then(list => {
             if (list.status)
                 return res.status(200).send({ result: 'success', data: list.record })
+            else
+                return res.status(200).send({ result: 'fail', data: null, error: list.error })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
+const list_banner = (req, res) => {
+    try {
+        vendor.bannerList().then(list => {
+            if (list.status)
+                return res.status(200).send({ result: 'success', data: list.banners })
+            else
+                return res.status(200).send({ result: 'fail', data: null, error: list.error })
+        })
+    } catch (error) {
+        return res.send({ result: 'fail', error: error.toString(), data: null })
+    }
+}
+
+const list_detailedSubCategory_for_vendor = (req, res) => {
+    try {
+        vendor.listDetailedSubCategoryforVendor().then(list => {
+            if (list.status)
+                return res.status(200).send({ result: 'success', data: list.sub_cat })
             else
                 return res.status(200).send({ result: 'fail', data: null, error: list.error })
         })
@@ -175,8 +215,10 @@ router.patch('/vendor_status/:id/:status', active_vendor)
 router.post('/send_otp', generate_otp)
 router.patch('/update_mobile', verify_otp_update_mobile)
 router.patch('/update_image', update_image)
-router.get('/new_booking', newBooking)
-
+router.get('/new_booking', list_new_booking)
+router.get('/banner', list_banner)
+router.get('/sub_category', list_detailedSubCategory_for_vendor)
+router.put('/basic_profile', update_basic_profile)
 
 module.exports = router
 

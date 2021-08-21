@@ -20,6 +20,9 @@ const add = (req, res) => {
 
 const list_all_sub_category = (req, res) => {
     try {
+        // let a = JSON.parse(JSON.stringify('(' + req.query.query + ')'))
+        // console.log("a.category_id=", a)
+        // console.log("a.category_id=", a.category_id)
         let obj = eval('(' + req.query.query + ')')
         let jsonStr = JSON.stringify(obj)
         queryParams = JSON.parse(jsonStr)
@@ -64,7 +67,7 @@ const update_specific_sub_category = (req, res) => {
 }
 
 const active = async (req, res) => {
-    console.log("reached",req.body)
+    console.log("reached", req.body)
     try {
         sub_category.active(req.params.id, req.params.status).then(update_status => {
             if (update_status.status)
@@ -124,7 +127,7 @@ const del_sub_category_image = (req, res) => {
 
 }
 
-const active_image =  (req, res) => {
+const active_image = (req, res) => {
     try {
         sub_category.activeImage(req.params.id, req.params.sub_category_id, req.params.image, req.params.type, req.params.status).then(status => {
             if (status.status)
@@ -138,18 +141,6 @@ const active_image =  (req, res) => {
     }
 }
 
-const list_detailedSubCategory_for_vendor = (req, res) => {
-    try {
-        sub_category.listDetailedSubCategory().then(list => {
-            if (list.status)
-                return res.status(200).send({ result: 'success', data: list.sub_cat })
-            else
-                return res.status(200).send({ result: 'fail', data: null, error: list.error })
-        })
-    } catch (error) {
-        return res.send({ result: 'fail', error: error.toString(), data: null })
-    }
-}
 
 router.post('/', add)
 router.get('/', list_all_sub_category)
@@ -160,7 +151,6 @@ router.post('/sub_category_image', upload_image)
 router.get('/sub_category_image', list_image)
 router.delete('/sub_category_image/:id', del_sub_category_image)
 router.get('/sub_category_image/active/:id/:sub_category_id/:image/:type/:status', active_image)
-router.get('/vendor', list_detailedSubCategory_for_vendor)
 
 module.exports = router
 
